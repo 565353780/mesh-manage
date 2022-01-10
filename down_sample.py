@@ -29,3 +29,4 @@ def point_cloud_voxel_downsample_with_rgb(input: torch.Tensor, voxel_size=0.01):
     sampled_label = dlp.from_dlpack(pcd.point["label"].to_dlpack())
     down_points = torch.hstack([sampled_points, sampled_rgb, sampled_label])
     return down_points if not init_numpy else down_points.cpu().numpy()
+
