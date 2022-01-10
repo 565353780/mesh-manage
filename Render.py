@@ -21,8 +21,9 @@ class PointCloudRender:
             dtype=np.uint8,
         )
 
-        self.labels = None
         self.pointcloud_file_path = None
+        self.label_channel_idx = None
+        self.labels = None
 
         self.pointcloud = None
         self.labeled_point_cluster_list = None
@@ -32,20 +33,22 @@ class PointCloudRender:
         self.labeled_point_cluster_list = []
 
         print("start reading labels...")
-        label_list = []
+        lines = None
         with open(self.pointcloud_file_path, "r") as f:
             lines = f.readlines()
-            find_start_line = False
-            for line in tqdm(lines):
-                if "DATA ascii" in line:
-                    find_start_line = True
-                    continue
-                if not find_start_line:
-                    continue
-                line_data = line.split("\n")[0].split(" ")
-                if len(line_data) < 5:
-                    continue
-                label_list.append(int(line_data[3]))
+
+        label_list = []
+        find_start_line = False
+        for line in tqdm(lines):
+            if "DATA ascii" in line:
+                find_start_line = True
+                continue
+            if not find_start_line:
+                continue
+            line_data = line.split("\n")[0].split(" ")
+            if len(line_data) < 5:
+                continue
+            label_list.append(int(line_data[self.label_channel_idx]))
 
         print("start reading points in pointcloud...", end="")
         np_points = np.asarray(self.pointcloud.points)
@@ -70,8 +73,10 @@ class PointCloudRender:
 
     def loadPointCloud(self,
                        pointcloud_file_path,
+                       label_channel_idx,
                        labels):
         self.pointcloud_file_path = pointcloud_file_path
+        self.label_channel_idx = label_channel_idx
         self.labels = labels
 
         print("start loading pointcloud...", end="")
@@ -89,6 +94,8 @@ class PointCloudRender:
         print("start create rendered pointcloud...")
         for render_label in show_labels:
             render_point_cluster = self.labeled_point_cluster_list[render_label]
+            if len(render_point_cluster) == 0:
+                continue
             print("\t for label " + str(render_label) + "...")
             for render_point in tqdm(render_point_cluster):
                 render_points.append(render_point)
@@ -101,18 +108,17 @@ class PointCloudRender:
         return True
 
 if __name__ == "__main__":
-    pointcloud_file_path = "./masked_pc/front_3d/01.pcd"
+    pointcloud_file_path = "./masked_pc/home/home_DownSample_32.pcd"
+    label_channel_idx = 3
     labels = [
         "ZERO", "table", "chair", "sofa", "lamp",
         "bed", "cabinet", "lantern", "light", "wall",
         "painting", "refrigerator"]
-    show_labels = [
-           1, 2, 3, 4,
-        5, 6, 7, 8,
-        10, 11]
+    show_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11]
 
     pointcloud_render = PointCloudRender()
     pointcloud_render.loadPointCloud(pointcloud_file_path,
+                                     label_channel_idx,
                                      labels)
     pointcloud_render.render(show_labels)
 

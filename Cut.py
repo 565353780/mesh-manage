@@ -8,49 +8,59 @@ import open3d as o3d
 class PointCloudCut:
     def __init__(self):
         self.pointcloud_file_path = None
-        self.cut_save_range = None
+        self.labeled_pointcloud_file_path = None
+        self.label_channel_idx = None
+        self.cut_labels = None
 
         self.pointcloud = None
+        self.labeled_pointcloud = None
         return
 
     def loadPointCloud(self,
                        pointcloud_file_path,
-                       cut_save_range):
+                       labeled_pointcloud_file_path,
+                       label_channel_idx,
+                       cut_labels):
         self.pointcloud_file_path = pointcloud_file_path
-        self.cut_save_range = cut_save_range
+        self.labeled_pointcloud_file_path = labeled_pointcloud_file_path
+        self.label_channel_idx = label_channel_idx
+        self.cut_labels = cut_labels
 
-        print("start load pointcloud...", end="")
+        print("start loading pointcloud...", end="")
         self.pointcloud = o3d.io.read_point_cloud(self.pointcloud_file_path)
+        print("SUCCESS!")
+
+        print("start loading labeled pointcloud...", end="")
+        self.labeled_pointcloud = o3d.io.read_point_cloud(self.labeled_pointcloud_file_path)
         print("SUCCESS!")
         return True
 
     def cut(self):
+        print("start reading labels...")
+        lines = None
+        with open(self.labeled_pointcloud_file_path, "r") as f:
+            lines = f.readlines()
+
+        label_list = []
+        find_start_line = False
+        for line in tqdm(lines):
+            if "DATA ascii" in line:
+                find_start_line = True
+                continue
+            if not find_start_line:
+                continue
+            line_data = line.split("\n")[0].split(" ")
+            if len(line_data) < 5:
+                continue
+            label_list.append(int(line_data[self.label_channel_idx]))
+
         print("start read points in pointcloud...", end="")
         np_points = np.asarray(self.pointcloud.points)
-        if np_points.shape[0] == 0:
-            print("PointCloudCut::cut : pointcloud is empty!")
+        if np_points.shape[0] != len(label_list):
+            print("PointCloudCut::cut : label size not matched!")
             return False
         point_list = np_points.tolist()
         print("SUCCESS!")
-
-        print("start analyzing pointcloud...")
-        x_min = point_list[0][0]
-        x_max = x_min
-        y_min = point_list[0][1]
-        y_max = y_min
-        z_min = point_list[0][2]
-        z_max = z_min
-        for point in tqdm(point_list):
-            x_min = min(x_min, point[0])
-            x_max = max(x_max, point[0])
-            y_min = min(y_min, point[1])
-            y_max = max(y_max, point[1])
-            z_min = min(z_min, point[2])
-            z_max = max(z_max, point[2])
-
-        x_diff = x_max - x_min
-        y_diff = y_max - y_min
-        z_diff = z_max - z_min
 
         print("start read colors in pointcloud...", end="")
         np_colors = np.asarray(self.pointcloud.colors)
@@ -61,27 +71,16 @@ class PointCloudCut:
         show_colors = []
 
         print("start cutting pointcloud...")
+        cut_point_num = 0
         for i in tqdm(range(np_points.shape[0])):
-            point = point_list[i]
-            point_x_diff = point[0] - x_min
-            point_y_diff = point[1] - y_min
-            point_z_diff = point[2] - z_min
+            label = label_list[i]
+            if label in self.cut_labels:
+                cut_point_num += 1
+                continue
 
-            if x_diff > 0:
-                unit_x = point_x_diff / x_diff
-                if unit_x < self.cut_save_range[0][0] or unit_x > self.cut_save_range[0][1]:
-                    continue
-            if y_diff > 0:
-                unit_y = point_y_diff / y_diff
-                if unit_y < self.cut_save_range[1][0] or unit_y > self.cut_save_range[1][1]:
-                    continue
-            if z_diff > 0:
-                unit_z = point_z_diff / z_diff
-                if unit_z < self.cut_save_range[2][0] or unit_z > self.cut_save_range[2][1]:
-                    continue
-
-            show_points.append(point)
+            show_points.append(point_list[i])
             show_colors.append(color_list[i])
+        print("cut ", cut_point_num, " points")
 
         cutted_pointcloud = o3d.geometry.PointCloud()
         cutted_pointcloud.points = o3d.utility.Vector3dVector(np.array(show_points))
@@ -91,11 +90,15 @@ class PointCloudCut:
         return True
 
 if __name__ == "__main__":
-    pointcloud_file_path = "./masked_pc/home/home.ply"
-    cut_save_range = [[0.5, 1.0], [0, 1], [0, 1]]
+    pointcloud_file_path = "./masked_pc/home/home_DownSample_32.pcd"
+    labeled_pointcloud_file_path = "./masked_pc/home/home_DownSample_32_cut.pcd"
+    label_channel_idx = 4
+    cut_labels = [1]
 
     pointcloud_cut = PointCloudCut()
     pointcloud_cut.loadPointCloud(pointcloud_file_path,
-                                  cut_save_range)
+                                  labeled_pointcloud_file_path,
+                                  label_channel_idx,
+                                  cut_labels)
     pointcloud_cut.cut()
 
