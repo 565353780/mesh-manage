@@ -3,6 +3,7 @@
 
 import numpy as np
 import open3d as o3d
+import pandas as pd
 
 class PointCloudRender:
     def __init__(self):
@@ -23,6 +24,7 @@ class PointCloudRender:
         self.pointcloud_file_path = None
 
         self.pointcloud = None
+        self.color_array = None
         return
 
     def loadPointCloud(self,
@@ -31,9 +33,26 @@ class PointCloudRender:
 
         self.pointcloud = o3d.io.read_point_cloud(self.pointcloud_file_path)
 
+    def createColor(self):
+        np_labels = np.asarray(self.pointcloud["label"])
+        print(np_labels)
+        with open(self.pointcloud_file_path, "r") as f:
+            lines = f.readlines()
+            for line in lines:
+                if "DATA ascii" in line:
+                    continue
+        self.color_array = []
+        np_points = np.asarray(self.pointcloud.points)
+        np_colors = np.asarray(self.pointcloud.colors)
+        print(np_points)
+        print("============================")
+        print(np_colors)
+        return True
+
     def render(self):
-        pointcloud_colors = o3d.utility.Vector3dVector((self.d3_40_colors_rgb(original_point_cloud[:, 3]) / 255.0))
-        print(pointcloud_colors.shape)
+        self.createColor()
+
+        #  pointcloud_colors = o3d.utility.Vector3dVector((self.d3_40_colors_rgb(original_point_cloud[:, 3]) / 255.0))
         return True
 
 if __name__ == "__main__":

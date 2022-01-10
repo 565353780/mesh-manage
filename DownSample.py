@@ -45,14 +45,14 @@ class PointCloudDownSample:
         down_sampled_pointcloud = o3d.geometry.PointCloud.uniform_down_sample(
             self.source_pointcloud, down_sample_cluster_num)
 
-        o3d.io.write_point_cloud(down_sampled_pointcloud_file_path, down_sampled_pointcloud)
+        o3d.io.write_point_cloud(down_sampled_pointcloud_file_path, down_sampled_pointcloud, True)
         print("SUCCESS!")
         return True
 
     def generateDownSampledPointCloud(self):
         down_sample_cluster_num = self.down_sample_multiply
 
-        for i in range(self.down_sample_level_max):
+        for _ in range(self.down_sample_level_max):
             self.downSample(down_sample_cluster_num)
             down_sample_cluster_num *= self.down_sample_multiply
         return True
