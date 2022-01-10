@@ -7,14 +7,6 @@ import pandas as pd
 
 class PointCloudRender:
     def __init__(self):
-        self.labels = [
-            "ZERO", "table", "chair", "sofa", "lamp",
-            "bed", "cabinet", "lantern", "light", "wall",
-            "painting", "refrigerator"]
-        self.show_labels = [
-               1, 2, 3, 4,
-            5, 6, 7, 8,
-            10, 11]
         self.d3_40_colors_rgb = np.array(
             [
                 [164, 218, 252], [120, 173, 219], [253, 147, 81], [252, 234, 163], [0, 128, 128],
@@ -29,6 +21,7 @@ class PointCloudRender:
             dtype=np.uint8,
         )
 
+        self.labels = None
         self.pointcloud_file_path = None
 
         self.pointcloud = None
@@ -73,20 +66,22 @@ class PointCloudRender:
         return True
 
     def loadPointCloud(self,
-                       pointcloud_file_path):
+                       pointcloud_file_path,
+                       labels):
         self.pointcloud_file_path = pointcloud_file_path
+        self.labels = labels
 
         self.pointcloud = o3d.io.read_point_cloud(self.pointcloud_file_path)
 
         self.splitLabeledPoints()
         return True
 
-    def render(self):
+    def render(self, show_labels):
         rendered_pointcloud = o3d.geometry.PointCloud()
 
         render_points = []
         render_colors = []
-        for render_label in self.show_labels:
+        for render_label in show_labels:
             render_point_cluster = self.labeled_point_cluster_list[render_label]
             for render_point in render_point_cluster:
                 render_points.append(render_point)
@@ -100,8 +95,17 @@ class PointCloudRender:
 
 if __name__ == "__main__":
     pointcloud_file_path = "./masked_pc/front_3d/01.pcd"
+    labels = [
+        "ZERO", "table", "chair", "sofa", "lamp",
+        "bed", "cabinet", "lantern", "light", "wall",
+        "painting", "refrigerator"]
+    show_labels = [
+           1, 2, 3, 4,
+        5, 6, 7, 8,
+        10, 11]
 
     pointcloud_render = PointCloudRender()
-    pointcloud_render.loadPointCloud(pointcloud_file_path)
-    pointcloud_render.render()
+    pointcloud_render.loadPointCloud(pointcloud_file_path,
+                                     labels)
+    pointcloud_render.render(show_labels)
 
