@@ -12,6 +12,7 @@ class PointCloudDownSample:
 
         self.pointcloud_folder_path = None
         self.pointcloud_file_basename = None
+        self.pointcloud_file_format = None
         self.source_pointcloud = None
         return
 
@@ -27,7 +28,9 @@ class PointCloudDownSample:
 
         pointcloud_file_path_split = self.pointcloud_file_path.split("/")
         pointcloud_file_name = pointcloud_file_path_split[len(pointcloud_file_path_split) - 1]
-        self.pointcloud_file_basename = pointcloud_file_name.split(".")[0]
+        pointcloud_file_name_split = pointcloud_file_name.split(".")
+        self.pointcloud_file_basename = pointcloud_file_name_split[0]
+        self.pointcloud_file_format = pointcloud_file_name_split[1]
         self.pointcloud_folder_path = self.pointcloud_file_path.split(pointcloud_file_name)[0]
 
         print("start reading pointcloud...", end="")
@@ -50,6 +53,13 @@ class PointCloudDownSample:
         return True
 
     def generateDownSampledPointCloud(self):
+        if self.pointcloud_file_format != self.output_format:
+            convert_pointcloud_file_path = \
+                self.pointcloud_folder_path + self.pointcloud_file_basename + "." + self.output_format
+            print("start converting pointcloud file to : " + convert_pointcloud_file_path + "...", end="")
+            o3d.io.write_point_cloud(convert_pointcloud_file_path, self.source_pointcloud, True)
+            print("SUCCESS!")
+
         down_sample_cluster_num = self.down_sample_multiply
 
         for _ in range(self.down_sample_level_max):
@@ -58,7 +68,7 @@ class PointCloudDownSample:
         return True
 
 if __name__ == "__main__":
-    pointcloud_file_path = "./masked_pc/office/office.ply"
+    pointcloud_file_path = "./masked_pc/home/home.ply"
     output_format = "pcd"
     down_sample_multiply = 2
     down_sample_level_max = 5
