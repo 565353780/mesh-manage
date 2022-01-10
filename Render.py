@@ -7,6 +7,14 @@ import pandas as pd
 
 class PointCloudRender:
     def __init__(self):
+        self.labels = [
+            "ZERO", "table", "chair", "sofa", "lamp",
+            "bed", "cabinet", "lantern", "light", "wall",
+            "painting", "refrigerator"]
+        self.show_labels = [
+               1, 2, 3, 4,
+            5, 6, 7, 8,
+            10, 11]
         self.d3_40_colors_rgb = np.array(
             [
                 [164, 218, 252], [120, 173, 219], [253, 147, 81], [252, 234, 163], [0, 128, 128],
@@ -24,8 +32,45 @@ class PointCloudRender:
         self.pointcloud_file_path = None
 
         self.pointcloud = None
-        self.color_array = None
+        self.labeled_point_cluster_list = None
         return
+
+    def splitLabeledPoints(self):
+        self.labeled_point_cluster_list = []
+
+        label_list = []
+        with open(self.pointcloud_file_path, "r") as f:
+            lines = f.readlines()
+            find_start_line = False
+            for line in lines:
+                if "DATA ascii" in line:
+                    find_start_line = True
+                    continue
+                if not find_start_line:
+                    continue
+                line_data = line.split("\n")[0].split(" ")
+                if len(line_data) < 5:
+                    continue
+                label_list.append(int(line_data[3]))
+
+        np_points = np.asarray(self.pointcloud.points)
+        if np_points.shape[0] != len(label_list):
+            print("PointCloudRender::createColor : label size not matched!")
+            return False
+
+        labeled_point_list = []
+
+        for _ in range(len(self.labels)):
+            labeled_point_list.append([])
+
+        for i in range(np_points.shape[0]):
+            point = np_points[i]
+            label = label_list[i]
+            labeled_point_list[label].append([point[0], point[1], point[2]])
+
+        for labeled_point_cluster in labeled_point_list:
+            self.labeled_point_cluster_list.append(labeled_point_cluster)
+        return True
 
     def loadPointCloud(self,
                        pointcloud_file_path):
@@ -33,26 +78,24 @@ class PointCloudRender:
 
         self.pointcloud = o3d.io.read_point_cloud(self.pointcloud_file_path)
 
-    def createColor(self):
-        np_labels = np.asarray(self.pointcloud["label"])
-        print(np_labels)
-        with open(self.pointcloud_file_path, "r") as f:
-            lines = f.readlines()
-            for line in lines:
-                if "DATA ascii" in line:
-                    continue
-        self.color_array = []
-        np_points = np.asarray(self.pointcloud.points)
-        np_colors = np.asarray(self.pointcloud.colors)
-        print(np_points)
-        print("============================")
-        print(np_colors)
+        self.splitLabeledPoints()
         return True
 
     def render(self):
-        self.createColor()
+        rendered_pointcloud = o3d.geometry.PointCloud()
 
-        #  pointcloud_colors = o3d.utility.Vector3dVector((self.d3_40_colors_rgb(original_point_cloud[:, 3]) / 255.0))
+        render_points = []
+        render_colors = []
+        for render_label in self.show_labels:
+            render_point_cluster = self.labeled_point_cluster_list[render_label]
+            for render_point in render_point_cluster:
+                render_points.append(render_point)
+                render_colors.append(self.d3_40_colors_rgb[render_label % len(self.d3_40_colors_rgb)] / 255.0)
+
+        rendered_pointcloud.points = o3d.utility.Vector3dVector(np.array(render_points))
+        rendered_pointcloud.colors = o3d.utility.Vector3dVector(np.array(render_colors))
+
+        o3d.visualization.draw_geometries([rendered_pointcloud])
         return True
 
 if __name__ == "__main__":
