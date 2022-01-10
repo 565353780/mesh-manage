@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+from tqdm import tqdm
 import open3d as o3d
 import pandas as pd
 
@@ -31,11 +32,12 @@ class PointCloudRender:
     def splitLabeledPoints(self):
         self.labeled_point_cluster_list = []
 
+        print("start reading labels...")
         label_list = []
         with open(self.pointcloud_file_path, "r") as f:
             lines = f.readlines()
             find_start_line = False
-            for line in lines:
+            for line in tqdm(lines):
                 if "DATA ascii" in line:
                     find_start_line = True
                     continue
@@ -46,17 +48,19 @@ class PointCloudRender:
                     continue
                 label_list.append(int(line_data[3]))
 
+        print("start reading points in pointcloud...", end="")
         np_points = np.asarray(self.pointcloud.points)
         if np_points.shape[0] != len(label_list):
             print("PointCloudRender::createColor : label size not matched!")
             return False
+        print("SUCCESS!")
 
         labeled_point_list = []
-
         for _ in range(len(self.labels)):
             labeled_point_list.append([])
 
-        for i in range(np_points.shape[0]):
+        print("start clustering points in pointcloud...")
+        for i in tqdm(range(np_points.shape[0])):
             point = np_points[i]
             label = label_list[i]
             labeled_point_list[label].append([point[0], point[1], point[2]])
@@ -71,7 +75,9 @@ class PointCloudRender:
         self.pointcloud_file_path = pointcloud_file_path
         self.labels = labels
 
+        print("start loading pointcloud...", end="")
         self.pointcloud = o3d.io.read_point_cloud(self.pointcloud_file_path)
+        print("SUCCESS!")
 
         self.splitLabeledPoints()
         return True
@@ -81,9 +87,11 @@ class PointCloudRender:
 
         render_points = []
         render_colors = []
+        print("start create rendered pointcloud...")
         for render_label in show_labels:
             render_point_cluster = self.labeled_point_cluster_list[render_label]
-            for render_point in render_point_cluster:
+            print("\t for label " + str(render_label) + "...")
+            for render_point in tqdm(render_point_cluster):
                 render_points.append(render_point)
                 render_colors.append(self.d3_40_colors_rgb[render_label % len(self.d3_40_colors_rgb)] / 255.0)
 
