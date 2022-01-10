@@ -80,7 +80,6 @@ class PointCloudCut:
 
             show_points.append(point_list[i])
             show_colors.append(color_list[i])
-        print("cut ", cut_point_num, " points")
 
         cutted_pointcloud = o3d.geometry.PointCloud()
         cutted_pointcloud.points = o3d.utility.Vector3dVector(np.array(show_points))
