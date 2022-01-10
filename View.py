@@ -21,7 +21,7 @@ class PointCloudView:
         return True
 
 if __name__ == "__main__":
-    pointcloud_file_path = "./masked_pc/home/home_DownSample_2.pcd"
+    pointcloud_file_path = "./masked_pc/home/home.ply"
 
     pointcloud_view = PointCloudView()
 
