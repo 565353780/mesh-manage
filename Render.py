@@ -46,7 +46,7 @@ class PointCloudRender:
             if not find_start_line:
                 continue
             line_data = line.split("\n")[0].split(" ")
-            if len(line_data) < 5:
+            if len(line_data) < self.label_channel_idx:
                 continue
             label_list.append(int(line_data[self.label_channel_idx]))
 
@@ -109,12 +109,54 @@ class PointCloudRender:
 
 if __name__ == "__main__":
     pointcloud_file_path = "./masked_pc/home/home_DownSample_32.pcd"
+    pointcloud_file_path = "/home/chli/scene_0.pcd"
     label_channel_idx = 3
+
     labels = [
         "ZERO", "table", "chair", "sofa", "lamp",
         "bed", "cabinet", "lantern", "light", "wall",
         "painting", "refrigerator"]
     show_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11]
+
+    labels = [
+        "BG",
+        "person", "bicycle", "car", "motorcycle", "airplane",
+        "bus", "train", "truck", "boat", "traffic light",
+        "fire hydrant", "stop sign", "parking meter", "bench", "bird",
+        "cat", "dog", "horse", "sheep", "cow",
+        "elephant", "bear", "zebra", "giraffe", "backpack",
+        "umbrella", "handbag", "tie", "suitcase", "frisbee",
+        "skis", "snowboard", "sports ball", "kite", "baseball bat",
+        "baseball glove", "skateboard", "surfboard", "tennis racket", "bottle",
+        "wine glass", "cup", "fork", "knife", "spoon",
+        "bowl", "banana", "apple", "sandwich", "orange",
+        "broccoli", "carrot", "hot dog", "pizza", "donut",
+        "cake", "chair", "couch", "potted plant", "bed",
+        "dining table", "toilet", "tv", "laptop", "mouse",
+        "remote", "keyboard", "cell phone", "microwave", "oven",
+        "toaster", "sink", "refrigerator", "book", "clock",
+        "vase", "scissors", "teddy bear", "hair drier", "toothbrush"
+    ]
+    show_labels = [
+        0,
+        1, 2, 3, 4, 5,
+        6, 7, 8, 9, 10,
+        11, 12, 13, 14, 15,
+        16, 17, 18, 19, 20,
+        21, 22, 23, 24, 25,
+        26, 27, 28, 29, 30,
+        31, 32, 33, 34, 35,
+        36, 37, 38, 39, 40,
+        41, 42, 43, 44, 45,
+        46, 47, 48, 49, 50,
+        51, 52, 53, 54, 55,
+        56, 57, 58, 59, 60,
+        61, 62, 63, 64, 65,
+        66, 67, 68, 69, 70,
+        71, 72, 73, 74, 75,
+        76, 77, 78, 79, 80
+    ]
+
 
     pointcloud_render = PointCloudRender()
     pointcloud_render.loadPointCloud(pointcloud_file_path,
