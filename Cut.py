@@ -55,16 +55,14 @@ class PointCloudCut:
             label_list.append(int(line_data[self.label_channel_idx]))
 
         print("start read points in pointcloud...", end="")
-        np_points = np.asarray(self.pointcloud.points)
-        if np_points.shape[0] != len(label_list):
+        points = np.asarray(self.pointcloud.points).tolist()
+        if len(points) != len(label_list):
             print("PointCloudCut::cut : label size not matched!")
             return False
-        point_list = np_points.tolist()
         print("SUCCESS!")
 
         print("start read colors in pointcloud...", end="")
-        np_colors = np.asarray(self.pointcloud.colors)
-        color_list = np_colors.tolist()
+        colors = np.asarray(self.pointcloud.colors).tolist()
         print("SUCCESS!")
 
         show_points = []
@@ -72,14 +70,14 @@ class PointCloudCut:
 
         print("start cutting pointcloud...")
         cut_point_num = 0
-        for i in tqdm(range(np_points.shape[0])):
+        for i in tqdm(range(len(points))):
             label = label_list[i]
             if label in self.cut_labels:
                 cut_point_num += 1
                 continue
 
-            show_points.append(point_list[i])
-            show_colors.append(color_list[i])
+            show_points.append(points[i])
+            show_colors.append(colors[i])
 
         cutted_pointcloud = o3d.geometry.PointCloud()
         cutted_pointcloud.points = o3d.utility.Vector3dVector(np.array(show_points))

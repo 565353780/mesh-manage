@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 import numpy as np
+from multiprocessing import Process
 from tqdm import tqdm
 import open3d as o3d
 
-class PointCloudRender:
+from time import time
+
+class ObjectPointCloudRender:
     def __init__(self):
         self.d3_40_colors_rgb = np.array(
             [
@@ -21,20 +25,44 @@ class PointCloudRender:
             dtype=np.uint8,
         )
 
-        self.pointcloud_file_path = None
+        self.pointcloud_file_path_list = None
         self.label_channel_idx = None
         self.labels = None
 
-        self.pointcloud = None
+        self.pointcloud_list = None
         self.labeled_point_cluster_list = None
         return
 
-    def splitLabeledPoints(self):
+    def loadPointCloud(self,
+                       pointcloud_file_path_list,
+                       label_channel_idx,
+                       labels):
+        self.pointcloud_file_path_list = pointcloud_file_path_list
+        self.label_channel_idx = label_channel_idx
+        self.labels = labels
+
+        self.pointcloud_list = []
+        for pointcloud_file_path in self.pointcloud_file_path_list:
+            print("start reading pointcloud :")
+            print(pointcloud_file_path)
+            pointcloud = o3d.io.read_point_cloud(pointcloud_file_path)
+            self.pointcloud_list.append(pointcloud)
+        return True
+
+    def getPointListWithLabel(self, point_list, label_list, label):
+        point_list_with_label = []
+        for i in range(len(point_list)):
+            if label_list[i] != label:
+                continue
+            point_list_with_label.append(point_list[i])
+        return point_list_with_label
+
+    def splitLabeledPoints(self, scene_pointcloud_file_path):
         self.labeled_point_cluster_list = []
 
         print("start reading labels...")
         lines = None
-        with open(self.pointcloud_file_path, "r") as f:
+        with open(scene_pointcloud_file_path, "r") as f:
             lines = f.readlines()
 
         label_list = []
@@ -51,7 +79,8 @@ class PointCloudRender:
             label_list.append(int(line_data[self.label_channel_idx]))
 
         print("start reading points in pointcloud...", end="")
-        points = np.asarray(self.pointcloud.points).tolist()
+        scene_pointcloud = o3d.io.read_point_cloud(scene_pointcloud_file_path)
+        points = np.asarray(scene_pointcloud.points).tolist()
         if len(points) != len(label_list):
             print("PointCloudRender::createColor : label size not matched!")
             return False
@@ -60,46 +89,40 @@ class PointCloudRender:
         labeled_point_list = []
         for _ in range(len(self.labels)):
             labeled_point_list.append([])
-
         print("start clustering points in pointcloud...")
         for i in tqdm(range(len(points))):
             point = points[i]
             label = label_list[i]
             labeled_point_list[label].append(point)
-
         for labeled_point_cluster in labeled_point_list:
             self.labeled_point_cluster_list.append(labeled_point_cluster)
         return True
 
-    def loadPointCloud(self,
-                       pointcloud_file_path,
-                       label_channel_idx,
-                       labels):
-        self.pointcloud_file_path = pointcloud_file_path
-        self.label_channel_idx = label_channel_idx
-        self.labels = labels
+    def render(self, show_labels, scene_pointcloud_file_path=None):
+        if scene_pointcloud_file_path is not None:
+            print("start reading wall...")
+            self.splitLabeledPoints(scene_pointcloud_file_path)
 
-        print("start loading pointcloud...", end="")
-        self.pointcloud = o3d.io.read_point_cloud(self.pointcloud_file_path)
-        print("SUCCESS!")
-
-        self.splitLabeledPoints()
-        return True
-
-    def render(self, show_labels):
         rendered_pointcloud = o3d.geometry.PointCloud()
 
         render_points = []
         render_colors = []
         print("start create rendered pointcloud...")
-        for render_label in show_labels:
-            render_point_cluster = self.labeled_point_cluster_list[render_label]
-            if len(render_point_cluster) == 0:
+        for i in tqdm(range(len(self.pointcloud_list))):
+            points = np.asarray(self.pointcloud_list[i].points).tolist()
+            if len(points) == 0:
                 continue
-            print("\t for label " + str(render_label) + "...")
-            for render_point in tqdm(render_point_cluster):
-                render_points.append(render_point)
-                render_colors.append(self.d3_40_colors_rgb[render_label % len(self.d3_40_colors_rgb)] / 255.0)
+            for point in points:
+                render_points.append(point)
+                render_colors.append(self.d3_40_colors_rgb[i % len(self.d3_40_colors_rgb)] / 255.0)
+
+        if scene_pointcloud_file_path is not None:
+            print("start create rendered wall...")
+            for wall_point in tqdm(self.labeled_point_cluster_list[0]):
+                if abs(wall_point[2]) > 0.01:
+                    continue
+                render_points.append(wall_point)
+                render_colors.append(np.array([132, 133, 135], dtype=np.uint8) / 255.0)
 
         rendered_pointcloud.points = o3d.utility.Vector3dVector(np.array(render_points))
         rendered_pointcloud.colors = o3d.utility.Vector3dVector(np.array(render_colors))
@@ -108,9 +131,28 @@ class PointCloudRender:
         return True
 
 if __name__ == "__main__":
-    pointcloud_file_path = "./masked_pc/RUN_LOG/2022_1_16_16-35-51/scene_68.pcd"
-    pointcloud_file_path = "/home/chli/.ros/RUN_LOG/PointCloud2ToObjectVecConverterServer/2022_1_18_12-9-8/scene_10.pcd"
-    label_channel_idx = 7
+    pointcloud_folder_path = "./masked_pc/RUN_LOG/2022_1_16_16-35-51/"
+    #  pointcloud_folder_path = "./masked_pc/RUN_LOG/2022_1_16_17-8-46/"
+    #  pointcloud_folder_path = "./masked_pc/RUN_LOG/2022_1_16_18-34-9/"
+    #  pointcloud_folder_path = "./masked_pc/RUN_LOG/2022_1_17_16-18-20/"
+    #  pointcloud_folder_path = "./masked_pc/RUN_LOG/2022_1_17_16-29-9/"
+    #  pointcloud_folder_path = "./masked_pc/RUN_LOG/2022_1_17_16-48-51/"
+    #  pointcloud_folder_path = "./masked_pc/RUN_LOG/2022_1_17_17-38-53/"
+    #  pointcloud_folder_path = "./masked_pc/RUN_LOG/2022_1_17_18-53-11/"
+    #  pointcloud_folder_path = "./masked_pc/RUN_LOG/2022_1_17_19-7-35/"
+    #  pointcloud_folder_path = "./masked_pc/RUN_LOG/2022_1_17_19-37-51/"
+    #  pointcloud_folder_path = "./masked_pc/RUN_LOG/2022_1_17_19-56-28/"
+
+    pointcloud_file_path_list = []
+    pointcloud_folder_file_name_list = os.listdir(pointcloud_folder_path)
+    scene_idx = 0
+    for pointcloud_folder_file_name in pointcloud_folder_file_name_list:
+        if "object" in pointcloud_folder_file_name:
+            pointcloud_file_path_list.append(pointcloud_folder_path + pointcloud_folder_file_name)
+        elif "scene" in pointcloud_folder_file_name:
+            scene_idx = max(scene_idx, int(pointcloud_folder_file_name.split(".")[0].split("_")[1]))
+    label_channel_idx = 3
+    scene_pointcloud_file_path = pointcloud_folder_path + "scene_" + str(scene_idx) + ".pcd"
 
     #  labels = [
         #  "ZERO", "table", "chair", "sofa", "lamp",
@@ -138,7 +180,7 @@ if __name__ == "__main__":
         "vase", "scissors", "teddy bear", "hair drier", "toothbrush"
     ]
     show_labels = [
-        #  0,
+        0,
         1, 2, 3, 4, 5,
         6, 7, 8, 9, 10,
         11, 12, 13, 14, 15,
@@ -158,9 +200,9 @@ if __name__ == "__main__":
     ]
 
 
-    pointcloud_render = PointCloudRender()
-    pointcloud_render.loadPointCloud(pointcloud_file_path,
+    pointcloud_render = ObjectPointCloudRender()
+    pointcloud_render.loadPointCloud(pointcloud_file_path_list,
                                      label_channel_idx,
                                      labels)
-    pointcloud_render.render(show_labels)
+    pointcloud_render.render(show_labels, scene_pointcloud_file_path)
 

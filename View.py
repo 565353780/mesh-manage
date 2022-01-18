@@ -21,8 +21,7 @@ class PointCloudView:
         return True
 
 if __name__ == "__main__":
-    pointcloud_file_path = "./masked_pc/home/home_DownSample_32.pcd"
-    pointcloud_file_path = "/home/chli/scene_0.pcd"
+    pointcloud_file_path = "./masked_pc/RUN_LOG/2022_1_16_16-35-51/scene_68.pcd"
 
     pointcloud_view = PointCloudView()
 
