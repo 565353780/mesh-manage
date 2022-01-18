@@ -48,7 +48,7 @@ class PointCloudRender:
             line_data = line.split("\n")[0].split(" ")
             if len(line_data) < self.label_channel_idx:
                 continue
-            label_list.append(int(line_data[self.label_channel_idx]))
+            label_list.append(int(float(line_data[self.label_channel_idx])))
 
         print("start reading points in pointcloud...", end="")
         points = np.asarray(self.pointcloud.points).tolist()
@@ -109,9 +109,8 @@ class PointCloudRender:
         return True
 
 if __name__ == "__main__":
-    pointcloud_file_path = "./masked_pc/RUN_LOG/2022_1_16_16-35-51/scene_68.pcd"
-    pointcloud_file_path = "/home/chli/.ros/RUN_LOG/PointCloud2ToObjectVecConverterServer/2022_1_18_12-9-8/scene_10.pcd"
-    label_channel_idx = 7
+    pointcloud_file_path = "./masked_pc/home/home_DownSample_8_masked_cut.pcd"
+    label_channel_idx = 6
 
     #  labels = [
         #  "ZERO", "table", "chair", "sofa", "lamp",

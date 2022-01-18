@@ -71,16 +71,19 @@ class PointCloudDownSample:
 
         down_sample_cluster_num = self.down_sample_multiply
 
+        if self.down_sample_level_max < 1:
+            return True
+
         for _ in range(self.down_sample_level_max):
             self.downSample(down_sample_cluster_num)
             down_sample_cluster_num *= self.down_sample_multiply
         return True
 
 if __name__ == "__main__":
-    pointcloud_file_path = "./masked_pc/home/home.ply"
+    pointcloud_file_path = "./masked_pc/home/home_cut.pcd"
     output_format = "pcd"
     down_sample_multiply = 2
-    down_sample_level_max = 5
+    down_sample_level_max = 0
 
     pointcloud_down_sample = PointCloudDownSample()
     pointcloud_down_sample.loadPointCloud(pointcloud_file_path,
