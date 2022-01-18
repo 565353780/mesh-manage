@@ -100,7 +100,7 @@ class ObjectPointCloudRender:
 
     def render(self, show_labels, scene_pointcloud_file_path=None):
         if scene_pointcloud_file_path is not None:
-            print("start reading wall...")
+            print("start reading floor and wall...")
             self.splitLabeledPoints(scene_pointcloud_file_path)
 
         rendered_pointcloud = o3d.geometry.PointCloud()
@@ -117,7 +117,7 @@ class ObjectPointCloudRender:
                 render_colors.append(self.d3_40_colors_rgb[i % len(self.d3_40_colors_rgb)] / 255.0)
 
         if scene_pointcloud_file_path is not None:
-            print("start create rendered wall...")
+            print("start create rendered floor...")
             for wall_point in tqdm(self.labeled_point_cluster_list[0]):
                 if abs(wall_point[2]) > 0.01:
                     continue
