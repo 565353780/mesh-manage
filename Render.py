@@ -80,7 +80,8 @@ class PointCloudRender:
         self.labels = labels
 
         print("start loading pointcloud...", end="")
-        self.pointcloud = o3d.io.read_point_cloud(self.pointcloud_file_path)
+        self.pointcloud = o3d.io.read_point_cloud(
+            self.pointcloud_file_path, print_progress=True)
         print("SUCCESS!")
 
         self.splitLabeledPoints()

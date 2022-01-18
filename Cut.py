@@ -27,11 +27,13 @@ class PointCloudCut:
         self.cut_labels = cut_labels
 
         print("start loading pointcloud...", end="")
-        self.pointcloud = o3d.io.read_point_cloud(self.pointcloud_file_path)
+        self.pointcloud = o3d.io.read_point_cloud(
+            self.pointcloud_file_path, print_progress=True)
         print("SUCCESS!")
 
         print("start loading labeled pointcloud...", end="")
-        self.labeled_pointcloud = o3d.io.read_point_cloud(self.labeled_pointcloud_file_path)
+        self.labeled_pointcloud = o3d.io.read_point_cloud(
+            self.labeled_pointcloud_file_path, print_progress=True)
         print("SUCCESS!")
         return True
 

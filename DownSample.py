@@ -34,7 +34,8 @@ class PointCloudDownSample:
         self.pointcloud_folder_path = self.pointcloud_file_path.split(pointcloud_file_name)[0]
 
         print("start reading pointcloud...", end="")
-        self.source_pointcloud = o3d.io.read_point_cloud(self.pointcloud_file_path)
+        self.source_pointcloud = o3d.io.read_point_cloud(
+            self.pointcloud_file_path, print_progress=True)
         print("SUCCESS!")
         return True
 
@@ -48,7 +49,11 @@ class PointCloudDownSample:
         down_sampled_pointcloud = o3d.geometry.PointCloud.uniform_down_sample(
             self.source_pointcloud, down_sample_cluster_num)
 
-        o3d.io.write_point_cloud(down_sampled_pointcloud_file_path, down_sampled_pointcloud, True)
+        o3d.io.write_point_cloud(
+            down_sampled_pointcloud_file_path,
+            down_sampled_pointcloud,
+            write_ascii=True,
+            print_progress=True)
         print("SUCCESS!")
         return True
 
@@ -57,7 +62,11 @@ class PointCloudDownSample:
             convert_pointcloud_file_path = \
                 self.pointcloud_folder_path + self.pointcloud_file_basename + "." + self.output_format
             print("start converting pointcloud file to : " + convert_pointcloud_file_path + "...", end="")
-            o3d.io.write_point_cloud(convert_pointcloud_file_path, self.source_pointcloud, True)
+            o3d.io.write_point_cloud(
+                convert_pointcloud_file_path,
+                self.source_pointcloud,
+                write_ascii=True,
+                print_progress=True)
             print("SUCCESS!")
 
         down_sample_cluster_num = self.down_sample_multiply

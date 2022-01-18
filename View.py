@@ -13,7 +13,8 @@ class PointCloudView:
     def loadPointCloud(self, pointcloud_file_path):
         self.pointcloud_file_path = pointcloud_file_path
 
-        self.pointcloud = o3d.io.read_point_cloud(self.pointcloud_file_path)
+        self.pointcloud = o3d.io.read_point_cloud(
+            self.pointcloud_file_path, print_progress=True)
         return True
 
     def view(self):
