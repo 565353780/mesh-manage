@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import numpy as np
 from tqdm import tqdm
 from scipy.spatial import KDTree
 
@@ -20,7 +21,7 @@ class Channel(object):
             self.type = "F"
             self.count = 1
             return True
-        if self.name in ["r", "g", "b", "instance_label"]:
+        if self.name in ["r", "g", "b", "rgb", "instance_label"]:
             self.size = 4
             self.type = "U"
             self.count = 1
@@ -56,7 +57,18 @@ class ChannelPoint(object):
         self.channel_list = []
         return
 
+    def updateFloatRGB(self):
+        r = self.getChannelValue("r")
+        g = self.getChannelValue("g")
+        b = self.getChannelValue("b")
+        if r is None or g is None or b is None:
+            return False
+        rgb = r << 16 | g << 8 | b | 1<<24
+        self.setChannelValue("rgb", rgb)
+        return True
+
     def setChannelValue(self, channel_name, channel_value):
+        set_rgb = channel_name == "rgb"
         if len(self.channel_list) == 0:
             new_channel = Channel()
             new_channel.setName(channel_name)
@@ -65,28 +77,27 @@ class ChannelPoint(object):
             return True
         for exist_channel in self.channel_list:
             if exist_channel.name == channel_name:
-                exist_channel.value = channel_value
+                exist_channel.setValue(channel_value)
+                if channel_name in ["r", "g", "b"] and not set_rgb:
+                    self.updateFloatRGB()
                 return True
 
         new_channel = Channel()
         new_channel.setName(channel_name)
         new_channel.setValue(channel_value)
         self.channel_list.append(new_channel)
+        if channel_name in ["r", "g", "b"] and not set_rgb:
+            self.updateFloatRGB()
         return True
 
     def getChannelValue(self, channel_name):
         if len(self.channel_list) == 0:
-            print("ChannelPoint::getChannelValue :")
-            print("channel_list is empty!")
             return None
 
         for exist_channel in self.channel_list:
             if exist_channel.name != channel_name:
                 continue
             return exist_channel.value
-
-        print("ChannelPoint::getChannelValue :")
-        print("this channel :", channel_name, "not exist!")
         return None
 
     def setXYZ(self, x, y, z):
@@ -105,7 +116,7 @@ class ChannelPoint(object):
         return [self.getChannelValue("x"), self.getChannelValue("y"), self.getChannelValue("z")]
     
     def getRGB(self):
-        return [self.getChannelValue("r"), self.getChannelValue("g"), self.getChannelValue("b")]
+        return [self.getChannelValue("r"), self.getChannelValue("g"), self.getChannelValue("b"), self.getChannelValue("rgb")]
 
 class ChannelPointCloud(object):
     def __init__(self):
@@ -263,7 +274,7 @@ class MergeChannel:
         return True
 
     def getNearestRGB(self, x, y, z):
-        nearest_rgb = [0, 0, 0]
+        nearest_rgb = [0, 0, 0, 0]
         if len(self.rgb_pointcloud.point_list) == 0:
             return nearest_rgb
         _, nearest_ponit_idx = self.kd_tree.query([x, y, z])
@@ -300,6 +311,10 @@ class MergeChannel:
                 continue
             if ordered_merge_channel_name == "b":
                 ordered_merge_channel_name_idx_list.append(-3)
+                need_to_add_color = True
+                continue
+            if ordered_merge_channel_name == "rgb":
+                ordered_merge_channel_name_idx_list.append(-4)
                 need_to_add_color = True
                 continue
             for i in range(len(self.merge_channel_name_list)):
@@ -346,6 +361,9 @@ class MergeChannel:
                     continue
                 if ordered_merge_channel_name_idx == -3:
                     new_point.setChannelValue("b", nearest_rgb[2])
+                    continue
+                if ordered_merge_channel_name_idx == -4:
+                    new_point.setChannelValue("rgb", nearest_rgb[3])
                     continue
                 merge_channel_name = self.merge_channel_name_list[ordered_merge_channel_name_idx]
                 merge_channel_in_pointcloud_idx = \
@@ -438,7 +456,7 @@ def demo():
         [3, 4, 5]])
     rgb_pointcloud_file_path = "./masked_pc/home/home_cut_DownSample_8.ply"
     rgb_pointcloud_xyzrgb_channel_idx_list = [0, 1, 2, 3, 4, 5]
-    ordered_merge_channel_name_list = ["x", "y", "z", "nx", "ny", "nz", "r", "g", "b", "instance_label"]
+    ordered_merge_channel_name_list = ["x", "y", "z", "nx", "ny", "nz", "rgb", "instance_label"]
     merged_pointcloud_file_path = "./masked_pc/home/home_DownSample_8_masked_merged.pcd"
 
     merge_channel = MergeChannel()

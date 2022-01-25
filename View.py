@@ -21,7 +21,7 @@ class PointCloudView:
         o3d.visualization.draw_geometries([self.pointcloud])
         return True
 
-if __name__ == "__main__":
+def demo():
     pointcloud_file_path = "./masked_pc/home/home_DownSample_8_masked_merged.pcd"
 
     pointcloud_view = PointCloudView()
@@ -29,4 +29,8 @@ if __name__ == "__main__":
     pointcloud_view.loadPointCloud(pointcloud_file_path)
 
     pointcloud_view.view()
+    return True
+
+if __name__ == "__main__":
+    demo()
 
