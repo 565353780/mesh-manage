@@ -4,6 +4,9 @@
 import numpy as np
 from tqdm import tqdm
 import open3d as o3d
+import open3d.visualization.rendering as rendering
+
+from channel_pointcloud import ChannelPointCloud
 
 class PointCloudRender:
     def __init__(self):
@@ -87,7 +90,7 @@ class PointCloudRender:
         self.splitLabeledPoints()
         return True
 
-    def render(self, show_labels):
+    def getRenderedPointCloud(self, show_labels):
         rendered_pointcloud = o3d.geometry.PointCloud()
 
         render_points = []
@@ -105,12 +108,28 @@ class PointCloudRender:
         rendered_pointcloud.points = o3d.utility.Vector3dVector(np.array(render_points))
         rendered_pointcloud.colors = o3d.utility.Vector3dVector(np.array(render_colors))
 
-        o3d.visualization.draw_geometries([rendered_pointcloud])
+        rendered_pointcloud.estimate_normals(
+            search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
+        return rendered_pointcloud
+
+    def render(self, show_labels):
+        rendered_pointcloud = self.getRenderedPointCloud(show_labels)
+
+        radii = [0.05, 0.1, 0.2, 0.4]
+        mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_ball_pivoting(
+            rendered_pointcloud, o3d.utility.DoubleVector(radii))
+
+        #  mesh = None
+        #  depth = 6
+        #  with o3d.utility.VerbosityContextManager(o3d.utility.VerbosityLevel.Debug) as cm:
+            #  mesh, densities = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(rendered_pointcloud, depth=depth)
+
+        o3d.visualization.draw_geometries([mesh])
         return True
 
-if __name__ == "__main__":
-    pointcloud_file_path = "./masked_pc/home/home_DownSample_8_masked_cut.pcd"
-    label_channel_idx = 6
+def demo():
+    pointcloud_file_path = "./masked_pc/home/home_DownSample_8_masked_merged.pcd"
+    label_channel_idx = 7
 
     #  labels = [
         #  "ZERO", "table", "chair", "sofa", "lamp",
@@ -163,4 +182,8 @@ if __name__ == "__main__":
                                      label_channel_idx,
                                      labels)
     pointcloud_render.render(show_labels)
+    return True
+
+if __name__ == "__main__":
+    demo()
 

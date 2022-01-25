@@ -190,6 +190,9 @@ class ObjectPointCloudRender:
         rendered_pointcloud.points = o3d.utility.Vector3dVector(np.array(render_points))
         rendered_pointcloud.colors = o3d.utility.Vector3dVector(np.array(render_colors))
 
+        rendered_pointcloud.estimate_normals(
+            search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
+
         self.render_center = rendered_pointcloud.get_axis_aligned_bounding_box().get_center()
 
         self.vis.create_window(window_name="Open3D RenderObject")
@@ -269,11 +272,8 @@ class ObjectPointCloudRender:
         out.release()
         return True
 
-
-        return True
-
-if __name__ == "__main__":
-    pointcloud_folder_path = "./masked_pc/RUN_LOG/2022_1_16_16-35-51/"
+def demo():
+    #  pointcloud_folder_path = "./masked_pc/RUN_LOG/2022_1_16_16-35-51/"
     #  pointcloud_folder_path = "./masked_pc/RUN_LOG/2022_1_16_17-8-46/"
     #  pointcloud_folder_path = "./masked_pc/RUN_LOG/2022_1_16_18-34-9/"
     #  pointcloud_folder_path = "./masked_pc/RUN_LOG/2022_1_17_16-18-20/"
@@ -350,4 +350,8 @@ if __name__ == "__main__":
                                      labels)
     #  pointcloud_render.render(show_labels, scene_pointcloud_file_path)
     pointcloud_render.saveRender(output_video_file_path)
+    return True
+
+if __name__ == "__main__":
+    demo()
 

@@ -14,7 +14,7 @@ class MergeChannel:
         self.pointcloud_list = []
         self.merge_channel_name_list = []
         self.merge_channel_in_pointcloud_idx_list = []
-        self. merge_pointcloud_valid = True
+        self.merge_pointcloud_valid = True
         return
 
     def reset(self):
@@ -23,7 +23,7 @@ class MergeChannel:
         self.pointcloud_list.clear()
         self.merge_channel_name_list.clear()
         self.merge_channel_in_pointcloud_idx_list.clear()
-        self. merge_pointcloud_valid = True
+        self.merge_pointcloud_valid = True
         return True
 
     def loadPointCloud(self,
