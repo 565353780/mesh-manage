@@ -14,6 +14,7 @@ label_pointcloud_channel_name_list = ["x", "y", "z", "label"]
 label_pointcloud_channel_idx_list = [0, 1, 2, 4]
 label_channel_name = "label"
 
+outlier_dist_max = 0.05
 estimate_normals_radius = 0.05
 estimate_normals_max_nn = 30
 
@@ -28,6 +29,8 @@ d3_40_colors_rgb = [
     [231, 150, 156], [123, 65, 115], [165, 81, 148], [206, 109, 189], [222, 158, 214]]
 
 # Process
+painted_pointcloud_file_path = xyz_pointcloud_file_path[:-4] + "_painted.pcd"
+
 xyz_pointcloud = ChannelPointCloud()
 xyz_pointcloud.loadData(xyz_pointcloud_file_path,
                         xyz_pointcloud_channel_name_list,
@@ -41,11 +44,9 @@ label_pointcloud.loadData(label_pointcloud_file_path,
 merge_pointcloud = ChannelPointCloud()
 merge_pointcloud.copyChannelValue(xyz_pointcloud, ["x", "y", "z"])
 merge_pointcloud.setChannelValueByKDTree(label_pointcloud, ["label"])
-merge_pointcloud.removeOutlierPoints(0.05)
-
+merge_pointcloud.removeOutlierPoints(outlier_dist_max)
 merge_pointcloud.paintByLabel(label_channel_name, d3_40_colors_rgb)
-painted_pointcloud_file_path = xyz_pointcloud_file_path[:-4] + "_painted.pcd"
 merge_pointcloud.savePointCloud(painted_pointcloud_file_path)
 
-transToPLY(painted_pointcloud_file_path)
+transToPLY(painted_pointcloud_file_path, estimate_normals_radius, estimate_normals_max_nn)
 

@@ -4,11 +4,11 @@
 from PointCloudClass.channel_pointcloud import ChannelPointCloud
 
 # Param
-pointcloud_file_path = "./test.pcd"
+pointcloud_file_path = "./masked_pc/front_3d/01_masked.pcd"
 channel_name_list = ["x", "y", "z", "label"]
 channel_idx_list = [0, 1, 2, 7]
 label_channel_name = "label"
-save_pointcloud_file_path = "./test_paint.pcd"
+save_pointcloud_file_path = "./masked_pc/front_3d/01_masked_painted.pcd"
 
 d3_40_colors_rgb = [
     [164, 218, 252], [120, 173, 219], [253, 147, 81], [252, 234, 163], [0, 128, 128],

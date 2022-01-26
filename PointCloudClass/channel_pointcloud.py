@@ -249,7 +249,7 @@ class ChannelPointCloud(object):
             point.setChannelValueList(channel_name_list, channel_value_list)
         return True
 
-    def removeOutlierPoints(self, dist_max):
+    def removeOutlierPoints(self, outlier_dist_max):
         self.updateKDTree()
 
         if self.kd_tree is None:
@@ -257,17 +257,17 @@ class ChannelPointCloud(object):
             print("\t kd_tree is None!")
             return False
 
-        if dist_max == 0:
+        if outlier_dist_max == 0:
             print("[ERROR][ChannelPointCloud::removeOutlierPoints]")
-            print("\t dist_max is 0!")
+            print("\t outlier_dist_max is 0!")
             return False
 
         print("[INFO][ChannelPointCloud::removeOutlierPoints]")
-        print("\t start remove outerlier points with dist_max = " + str(dist_max) + "...")
+        print("\t start remove outerlier points with outlier_dist_max = " + str(outlier_dist_max) + "...")
         remove_point_idx_list = []
         for i in tqdm(range(len(self.point_list))):
             current_nearest_dist = self.getSelfNearestDist(i)
-            if current_nearest_dist > dist_max:
+            if current_nearest_dist > outlier_dist_max:
                 remove_point_idx_list.append(i)
         if len(remove_point_idx_list) == 0:
             return True
