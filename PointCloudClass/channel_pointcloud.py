@@ -5,127 +5,7 @@ import os
 from scipy.spatial.kdtree import KDTree
 from tqdm import tqdm
 
-class Channel(object):
-    def __init__(self):
-        self.name = ""
-        self.value = 0
-        self.size = 0
-        self.type = ""
-        self.count = 1
-        return
-
-    def updateName(self):
-        if self.name in ["x", "y", "z", "nx", "ny", "nz"]:
-            self.size = 4
-            self.type = "F"
-            self.count = 1
-            return True
-        if self.name in ["r", "g", "b", "rgb", "instance_label"]:
-            self.size = 4
-            self.type = "U"
-            self.count = 1
-            return True
-        self.size = 4
-        self.type = "F"
-        self.count = 1
-        return True
-
-    def setName(self, name):
-        self.name = name
-        return self.updateName()
-
-    def updateValue(self):
-        if self.type == "F":
-            self.value = float(self.value)
-            return True
-        if self.type == "U":
-            self.value = int(self.value)
-            return True
-        if self.type == "I":
-            self.value = int(self.value)
-            return True
-        return True
-
-    def setValue(self, value):
-        self.value = value
-        self.updateValue()
-        return True
-
-    def outputInfo(self, info_level=0):
-        line_start = "\t" * info_level
-        print(line_start + "[INFO][Channel]")
-        print(line_start + "\t name: " + self.name)
-        print(line_start + "\t value: " + str(self.value))
-        print(line_start + "\t size: " + str(self.size))
-        print(line_start + "\t type: " + self.type)
-        print(line_start + "\t count: " + str(self.count))
-        return True
-
-class ChannelPoint(object):
-    def __init__(self):
-        self.channel_list = []
-        return
-
-    def updateFloatRGB(self):
-        r = self.getChannelValue("r")
-        g = self.getChannelValue("g")
-        b = self.getChannelValue("b")
-        if r is None or g is None or b is None:
-            return False
-        rgb = r << 16 | g << 8 | b | 1<<24
-        self.setChannelValue("rgb", rgb)
-        return True
-
-    def setChannelValue(self, channel_name, channel_value):
-        set_rgb = channel_name == "rgb"
-        if len(self.channel_list) == 0:
-            new_channel = Channel()
-            new_channel.setName(channel_name)
-            new_channel.setValue(channel_value)
-            self.channel_list.append(new_channel)
-            return True
-        for exist_channel in self.channel_list:
-            if exist_channel.name == channel_name:
-                exist_channel.setValue(channel_value)
-                if channel_name in ["r", "g", "b"] and not set_rgb:
-                    self.updateFloatRGB()
-                return True
-
-        new_channel = Channel()
-        new_channel.setName(channel_name)
-        new_channel.setValue(channel_value)
-        self.channel_list.append(new_channel)
-        if channel_name in ["r", "g", "b"] and not set_rgb:
-            self.updateFloatRGB()
-        return True
-
-    def setChannelValueList(self, channel_name_list, channel_value_list):
-        for i in range(len(channel_name_list)):
-            self.setChannelValue(channel_name_list[i], channel_value_list[i])
-        return True
-
-    def getChannelValue(self, channel_name):
-        if len(self.channel_list) == 0:
-            return None
-
-        for exist_channel in self.channel_list:
-            if exist_channel.name != channel_name:
-                continue
-            return exist_channel.value
-        return None
-
-    def getChannelValueList(self, channel_name_list):
-        channel_value_list = []
-        for channel_name in channel_name_list:
-            channel_value_list.append(self.getChannelValue(channel_name))
-        return channel_value_list
-
-    def outputInfo(self, info_level=0):
-        line_start = "\t" * info_level
-        print(line_start + "[INFO][ChannelPoint]")
-        for channel in self.channel_list:
-            channel.outputInfo(info_level + 1)
-        return True
+from PointCloudClass.channel_point import ChannelPoint
 
 class ChannelPointCloud(object):
     def __init__(self):
@@ -424,14 +304,14 @@ class ChannelPointCloud(object):
 def demo():
     source_pointcloud = ChannelPointCloud()
 
-    source_pointcloud.loadData("./test.pcd",
+    source_pointcloud.loadData("./masked_pc/test.pcd",
                                ["x", "y", "z", "rgb", "instance_label"],
                                [0, 1, 2, 6, 7])
 
-    #  label_pointcloud = ChannelPointCloud()
-    #  label_pointcloud.loadData("./masked_pc/home/home_DownSample_8_masked.pcd",
-                              #  ["x", "y", "z", "instance_label"],
-                              #  [0, 1, 2, 4])
+    label_pointcloud = ChannelPointCloud()
+    label_pointcloud.loadData("./masked_pc/home/home_DownSample_8_masked.pcd",
+                              ["x", "y", "z", "instance_label"],
+                              [0, 1, 2, 4])
 
     #  merge_pointcloud = ChannelPointCloud()
 
