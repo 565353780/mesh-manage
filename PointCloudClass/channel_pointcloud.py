@@ -11,11 +11,13 @@ class ChannelPointCloud(object):
     def __init__(self):
         self.point_list = []
         self.kd_tree = None
+        self.xyz_changed = True
         return
 
     def reset(self):
         self.point_list.clear()
         self.kd_tree = None
+        self.xyz_changed = True
         return True
 
     def getChannelValueList(self, channel_name):
@@ -34,6 +36,9 @@ class ChannelPointCloud(object):
         return channel_list_value_list
 
     def updateKDTree(self):
+        if not self.xyz_changed:
+            return True
+
         self.kd_tree = None
         xyz_list = self.getChannelListValueList(["x", "y", "z"])
         if len(xyz_list) == 0:
@@ -41,6 +46,7 @@ class ChannelPointCloud(object):
         if None in xyz_list[0]:
             return False
         self.kd_tree = KDTree(xyz_list)
+        self.xyz_changed = False
         return True
 
     def loadData(self, pointcloud_file_path, channel_name_list, channel_idx_list):
@@ -97,10 +103,13 @@ class ChannelPointCloud(object):
                 break
         print("[INFO][ChannelPointCloud::loadData]")
         print("\t loaded", loaded_point_num, "points from poitncloud!")
+
         self.updateKDTree()
         return True
 
     def getNearestPointInfo(self, x, y, z):
+        self.updateKDTree()
+
         if self.kd_tree is None:
             return None, None
         if len(self.point_list) == 0:
@@ -109,10 +118,18 @@ class ChannelPointCloud(object):
         return nearest_dist, nearest_point_idx
 
     def getNearestDist(self, x, y, z):
+        self.updateKDTree()
+
+        if self.kd_tree is None:
+            return None
+        if len(self.point_list) == 0:
+            return None
         nearest_dist, _ = self.kd_tree.query([x, y, z])
         return nearest_dist
 
     def getSelfNearestDist(self, point_idx):
+        self.updateKDTree()
+
         if self.kd_tree is None:
             return None
         if len(self.point_list) == 0:
@@ -177,6 +194,8 @@ class ChannelPointCloud(object):
                 new_point = ChannelPoint()
                 new_point.setChannelValueList(channel_name_list, channel_value_list)
                 self.point_list.append(new_point)
+
+            self.updateKDTree()
             return True
 
         for i in tqdm(pointcloud_size):
@@ -187,6 +206,8 @@ class ChannelPointCloud(object):
         return True
 
     def setChannelValueByKDTree(self, target_pointcloud, channel_name_list):
+        self.updateKDTree()
+
         if len(self.point_list) == 0:
             return True
 
@@ -229,6 +250,8 @@ class ChannelPointCloud(object):
         return True
 
     def removeOutlierPoints(self, dist_max):
+        self.updateKDTree()
+
         if self.kd_tree is None:
             print("[ERROR][ChannelPointCloud::removeOutlierPoints]")
             print("\t kd_tree is None!")
@@ -258,9 +281,9 @@ class ChannelPointCloud(object):
         if len(self.point_list) == 0:
             return True
 
-        first_point_label_value_list = self.point_list[0].getChannelValue(label_channel_name)
+        first_point_label_value = self.point_list[0].getChannelValue(label_channel_name)
 
-        if None in first_point_label_value_list:
+        if first_point_label_value is None:
             print("[ERROR][ChannelPointCloud::paintByLabel]")
             print("\t label_channel not found!")
             return False
