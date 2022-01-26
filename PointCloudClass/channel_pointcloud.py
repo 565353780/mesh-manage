@@ -239,6 +239,8 @@ class ChannelPointCloud(object):
         return True
 
     def getPCDHeader(self):
+        ignore_channel_name_list = ["r", "g", "b"]
+
         channel_list = []
 
         point_num = len(self.point_list)
@@ -250,21 +252,29 @@ class ChannelPointCloud(object):
 
         pcd_header += "FIELDS"
         for channel in channel_list:
+            if channel.name in ignore_channel_name_list:
+                continue
             pcd_header += " " + channel.name
         pcd_header += "\n"
 
         pcd_header += "SIZE"
         for channel in channel_list:
+            if channel.name in ignore_channel_name_list:
+                continue
             pcd_header += " " + str(channel.size)
         pcd_header += "\n"
 
         pcd_header += "TYPE"
         for channel in channel_list:
+            if channel.name in ignore_channel_name_list:
+                continue
             pcd_header += " " + channel.type
         pcd_header += "\n"
 
         pcd_header += "COUNT"
         for channel in channel_list:
+            if channel.name in ignore_channel_name_list:
+                continue
             pcd_header += " " + str(channel.count)
         pcd_header += "\n"
 
@@ -300,28 +310,4 @@ class ChannelPointCloud(object):
         for point in self.point_list:
             point.outputInfo(info_level + 1)
         return True
-
-def demo():
-    source_pointcloud = ChannelPointCloud()
-
-    source_pointcloud.loadData("./masked_pc/test.pcd",
-                               ["x", "y", "z", "rgb", "instance_label"],
-                               [0, 1, 2, 6, 7])
-
-    label_pointcloud = ChannelPointCloud()
-    label_pointcloud.loadData("./masked_pc/home/home_DownSample_8_masked.pcd",
-                              ["x", "y", "z", "instance_label"],
-                              [0, 1, 2, 4])
-
-    #  merge_pointcloud = ChannelPointCloud()
-
-    #  merge_pointcloud.copyChannelValue(source_pointcloud, ["x", "y", "z", "r", "g", "b"])
-    #  merge_pointcloud.setChannelValueByKDTree(label_pointcloud, ["instance_label"])
-    source_pointcloud.removeOutlierPoints(0.05)
-
-    source_pointcloud.savePointCloud("./test1.pcd")
-    return True
-
-if __name__ == "__main__":
-    demo()
 
