@@ -12,6 +12,8 @@ class ChannelPointCloud(object):
         self.point_list = []
         self.kd_tree = None
         self.xyz_changed = True
+
+        self.save_ignore_channel_name_list = ["r", "g", "b"]
         return
 
     def reset(self):
@@ -49,7 +51,7 @@ class ChannelPointCloud(object):
         self.xyz_changed = False
         return True
 
-    def loadData(self, pointcloud_file_path, channel_name_list, channel_idx_list):
+    def loadData(self, pointcloud_file_path):
         if not os.path.exists(pointcloud_file_path):
             print("[ERROR][ChannelPointCloud::loadData]")
             print("\t file not exist!")
@@ -60,10 +62,7 @@ class ChannelPointCloud(object):
         print("[INFO][ChannelPointCloud::loadData]")
         print("\t start load pointcloud :")
         print("\t pointcloud_file_path = " + pointcloud_file_path)
-        print("\t channel_name_list = [", end="")
-        for channel_name in channel_name_list:
-            print(" " + channel_name, end="")
-        print(" ]...")
+        channel_name_list = []
         lines = []
         with open(pointcloud_file_path, "r") as f:
             lines = f.readlines()
@@ -72,10 +71,19 @@ class ChannelPointCloud(object):
         loaded_point_num = 0
         find_start_line = False
         for line in tqdm(lines):
+            # load fields
+            if "property" in line:
+                channel_name = line.split("\n")[0].split(" ")[2]
+                channel_name_list.append(channel_name)
+                continue
+            if "FIELDS" in line:
+                channel_name_list = line.split("\n")[0].split("FIELDS ")[1].split(" ")
+                continue
+
+            # load point_num
             if "element vertex" in line:
                 point_num = int(line.split("\n")[0].split(" ")[2])
                 continue
-
             if "POINTS" in line:
                 point_num = int(line.split("\n")[0].split(" ")[1])
                 continue
@@ -91,8 +99,7 @@ class ChannelPointCloud(object):
 
             channel_value_list = []
             for i in range(len(channel_name_list)):
-                channel_idx = channel_idx_list[i]
-                channel_value_list.append(float(line_data[channel_idx]))
+                channel_value_list.append(float(line_data[i]))
 
             new_point = ChannelPoint()
             new_point.setChannelValueList(channel_name_list, channel_value_list)
@@ -304,8 +311,6 @@ class ChannelPointCloud(object):
         return True
 
     def getPCDHeader(self):
-        ignore_channel_name_list = ["r", "g", "b"]
-
         channel_list = []
 
         point_num = len(self.point_list)
@@ -317,28 +322,28 @@ class ChannelPointCloud(object):
 
         pcd_header += "FIELDS"
         for channel in channel_list:
-            if channel.name in ignore_channel_name_list:
+            if channel.name in self.save_ignore_channel_name_list:
                 continue
             pcd_header += " " + channel.name
         pcd_header += "\n"
 
         pcd_header += "SIZE"
         for channel in channel_list:
-            if channel.name in ignore_channel_name_list:
+            if channel.name in self.save_ignore_channel_name_list:
                 continue
             pcd_header += " " + str(channel.size)
         pcd_header += "\n"
 
         pcd_header += "TYPE"
         for channel in channel_list:
-            if channel.name in ignore_channel_name_list:
+            if channel.name in self.save_ignore_channel_name_list:
                 continue
             pcd_header += " " + channel.type
         pcd_header += "\n"
 
         pcd_header += "COUNT"
         for channel in channel_list:
-            if channel.name in ignore_channel_name_list:
+            if channel.name in self.save_ignore_channel_name_list:
                 continue
             pcd_header += " " + str(channel.count)
         pcd_header += "\n"
@@ -362,6 +367,10 @@ class ChannelPointCloud(object):
             for point in tqdm(self.point_list):
                 last_channel_idx = len(point.channel_list) - 1
                 for i in range(last_channel_idx + 1):
+                    if point.channel_list[i].name in self.save_ignore_channel_name_list:
+                        if i == last_channel_idx:
+                               f.write("\n")
+                        continue
                     f.write(str(point.channel_list[i].value))
                     if i < last_channel_idx:
                         f.write(" ")

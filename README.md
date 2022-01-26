@@ -19,7 +19,6 @@ python auto_paint.py
 ```bash
 python merge.py
 python paint.py
-python trans.py
 ```
 
 ## Enjoy it~

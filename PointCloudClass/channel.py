@@ -11,12 +11,16 @@ class Channel(object):
         return
 
     def updateName(self):
-        if self.name in ["x", "y", "z", "nx", "ny", "nz"]:
+        if self.name in [
+                "x", "y", "z",
+                "nx","ny", "nz"]:
             self.size = 4
             self.type = "F"
             self.count = 1
             return True
-        if self.name in ["r", "g", "b", "rgb", "label", "semantic_label", "instance_label"]:
+        if self.name in [
+                "r", "g", "b", "rgb",
+                "label", "semantic_label", "instance_label"]:
             self.size = 4
             self.type = "U"
             self.count = 1

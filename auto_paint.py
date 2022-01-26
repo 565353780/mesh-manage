@@ -5,13 +5,9 @@ from PointCloudClass.channel_pointcloud import ChannelPointCloud
 from PointCloudClass.trans_format import transToPLY
 
 # Param
-xyz_pointcloud_file_path = "./masked_pc/f14/f14_cut.ply"
-xyz_pointcloud_channel_name_list = ["x", "y", "z"]
-xyz_pointcloud_channel_idx_list = [0, 1, 2]
+xyz_pointcloud_file_path = "./masked_pc/office/office_cut.ply"
 
-label_pointcloud_file_path = "./masked_pc/f14/f14_cut_DownSample_8_masked.pcd"
-label_pointcloud_channel_name_list = ["x", "y", "z", "label"]
-label_pointcloud_channel_idx_list = [0, 1, 2, 4]
+label_pointcloud_file_path = "./masked_pc/office/office_DownSample_8_masked.pcd"
 label_channel_name = "label"
 
 outlier_dist_max = 0.05
@@ -32,14 +28,10 @@ d3_40_colors_rgb = [
 painted_pointcloud_file_path = xyz_pointcloud_file_path[:-4] + "_painted.pcd"
 
 xyz_pointcloud = ChannelPointCloud()
-xyz_pointcloud.loadData(xyz_pointcloud_file_path,
-                        xyz_pointcloud_channel_name_list,
-                        xyz_pointcloud_channel_idx_list)
+xyz_pointcloud.loadData(xyz_pointcloud_file_path)
 
 label_pointcloud = ChannelPointCloud()
-label_pointcloud.loadData(label_pointcloud_file_path,
-                          label_pointcloud_channel_name_list,
-                          label_pointcloud_channel_idx_list)
+label_pointcloud.loadData(label_pointcloud_file_path)
 
 merge_pointcloud = ChannelPointCloud()
 merge_pointcloud.copyChannelValue(xyz_pointcloud, ["x", "y", "z"])
