@@ -164,7 +164,11 @@ class ChannelPointCloud(object):
             return False
 
         print("[INFO][ChannelPointCloud::copyChannelValue]")
-        print("\t start copy channel value...")
+        print("\t start copy channel value :")
+        print("\t channel_name_list = [", end="")
+        for channel_name in channel_name_list:
+            print(" " + channel_name, end="")
+        print(" ]...")
         channel_list_value_list = \
             target_pointcloud.getChannelListValueList(channel_name_list)
 
@@ -207,7 +211,11 @@ class ChannelPointCloud(object):
             return False
 
         print("[INFO][ChannelPointCloud::setChannelValueByKDTree]")
-        print("\t start set channel value by KDTree...")
+        print("\t start set channel value by KDTree :")
+        print("\t channel_name_list = [", end="")
+        for channel_name in channel_name_list:
+            print(" " + channel_name, end="")
+        print(" ]...")
         for point in tqdm(self.point_list):
             xyz = point.getChannelValueList(["x", "y", "z"])
             channel_value_list = \
