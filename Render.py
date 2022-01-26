@@ -129,7 +129,8 @@ class PointCloudRender:
 
 def demo():
     pointcloud_file_path = "./masked_pc/home/home_DownSample_8_masked_merged.pcd"
-    label_channel_idx = 7
+    pointcloud_file_path = "./test1.pcd"
+    label_channel_idx = 4
 
     #  labels = [
         #  "ZERO", "table", "chair", "sofa", "lamp",

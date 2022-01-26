@@ -52,7 +52,7 @@ class Renderer(object):
 
 if __name__ == "__main__":
     pointcloud_file_path = "./masked_pc/home/home_DownSample_8_masked_merged.pcd"
-    label_channel_idx = 7
+    label_channel_idx = 4
 
     #  labels = [
         #  "ZERO", "table", "chair", "sofa", "lamp",
