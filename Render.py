@@ -115,16 +115,16 @@ class PointCloudRender:
     def render(self, show_labels):
         rendered_pointcloud = self.getRenderedPointCloud(show_labels)
 
-        radii = [0.05, 0.1, 0.2, 0.4]
-        mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_ball_pivoting(
-            rendered_pointcloud, o3d.utility.DoubleVector(radii))
+        #  radii = [0.05, 0.1, 0.2, 0.4]
+        #  mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_ball_pivoting(
+            #  rendered_pointcloud, o3d.utility.DoubleVector(radii))
 
         #  mesh = None
         #  depth = 6
         #  with o3d.utility.VerbosityContextManager(o3d.utility.VerbosityLevel.Debug) as cm:
             #  mesh, densities = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(rendered_pointcloud, depth=depth)
 
-        o3d.visualization.draw_geometries([mesh])
+        o3d.visualization.draw_geometries([rendered_pointcloud])
         return True
 
 def demo():

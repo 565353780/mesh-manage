@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+from scipy.spatial.kdtree import KDTree
 from tqdm import tqdm
 
 class Channel(object):
@@ -50,6 +51,16 @@ class Channel(object):
         self.updateValue()
         return True
 
+    def outputInfo(self, info_level=0):
+        line_start = "\t" * info_level
+        print(line_start + "Channel:")
+        print(line_start + "\t name: " + self.name)
+        print(line_start + "\t value: " + str(self.value))
+        print(line_start + "\t size: " + str(self.size))
+        print(line_start + "\t type: " + self.type)
+        print(line_start + "\t count: " + str(self.count))
+        return True
+
 class ChannelPoint(object):
     def __init__(self):
         self.channel_list = []
@@ -88,6 +99,11 @@ class ChannelPoint(object):
             self.updateFloatRGB()
         return True
 
+    def setChannelValueList(self, channel_name_list, channel_value_list):
+        for i in range(len(channel_name_list)):
+            self.setChannelValue(channel_name_list[i], channel_value_list[i])
+        return True
+
     def getChannelValue(self, channel_name):
         if len(self.channel_list) == 0:
             return None
@@ -98,46 +114,29 @@ class ChannelPoint(object):
             return exist_channel.value
         return None
 
-    def setXYZ(self, x, y, z):
-        self.setChannelValue("x", x)
-        self.setChannelValue("y", y)
-        self.setChannelValue("z", z)
-        return True
+    def getChannelValueList(self, channel_name_list):
+        channel_value_list = []
+        for channel_name in channel_name_list:
+            channel_value_list.append(self.getChannelValue(channel_name))
+        return channel_value_list
 
-    def setRGB(self, r, g, b):
-        self.setChannelValue("r", r)
-        self.setChannelValue("g", g)
-        self.setChannelValue("b", b)
+    def outputInfo(self, info_level=0):
+        line_start = "\t" * info_level
+        print(line_start + "ChannelPoint:")
+        for channel in self.channel_list:
+            channel.outputInfo(info_level + 1)
         return True
-
-    def getXYZ(self):
-        return [self.getChannelValue("x"), self.getChannelValue("y"), self.getChannelValue("z")]
-    
-    def getRGB(self):
-        return [self.getChannelValue("r"), self.getChannelValue("g"), self.getChannelValue("b"), self.getChannelValue("rgb")]
 
 class ChannelPointCloud(object):
     def __init__(self):
         self.point_list = []
+        self.kd_tree = None
         return
 
     def reset(self):
         self.point_list.clear()
+        self.kd_tree = None
         return True
-
-    def addPoint(self, x, y, z, r, g, b):
-        new_point = ChannelPoint()
-        new_point.setXYZ(x, y, z)
-        new_point.setRGB(r, g, b)
-        self.point_list.append(new_point)
-        return True
-
-    def setPointChannelValue(self, point_idx, channel_name, channel_value):
-        if point_idx >= len(self.point_list):
-            print("ChannelPointCloud::setPointChannelValue :")
-            print("point_idx out of range!")
-            return False
-        return self.point_list[point_idx].setChannelValue(channel_name, channel_value)
 
     def getChannelValueList(self, channel_name):
         channel_value_list = []
@@ -153,6 +152,16 @@ class ChannelPointCloud(object):
                 channel_value_list.append(point.getChannelValue(channel_name))
             channel_list_value_list.append(channel_value_list)
         return channel_list_value_list
+
+    def updateKDTree(self):
+        self.kd_tree = None
+        xyz_list = self.getChannelListValueList(["x", "y", "z"])
+        if len(xyz_list) == 0:
+            return False
+        if xyz_list[0][0] is None:
+            return False
+        self.kd_tree = KDTree(xyz_list)
+        return True
 
     def loadData(self, pointcloud_file_path, channel_name_list, channel_idx_list):
         if not os.path.exists(pointcloud_file_path):
@@ -187,18 +196,120 @@ class ChannelPointCloud(object):
                 continue
 
             line_data = line.split("\n")[0].split(" ")
-            new_point = ChannelPoint()
+
+            channel_value_list = []
             for i in range(len(channel_name_list)):
-                channel_name = channel_name_list[i]
                 channel_idx = channel_idx_list[i]
-                channel_value = float(line_data[channel_idx])
-                new_point.setChannelValue(channel_name, channel_value)
+                channel_value_list.append(float(line_data[channel_idx]))
+
+            new_point = ChannelPoint()
+            new_point.setChannelValueList(channel_name_list, channel_value_list)
             self.point_list.append(new_point)
             loaded_point_num += 1
 
             if loaded_point_num == point_num:
                 break
         print("loaded", loaded_point_num, "points from poitncloud!")
+        self.updateKDTree()
+        return True
+
+    def getNearestPointInfo(self, x, y, z):
+        if self.kd_tree is None:
+            return None, None
+        if len(self.point_list) == 0:
+            return None, None
+        nearest_dist, nearest_point_idx = self.kd_tree.query([x, y, z])
+        return nearest_dist, nearest_point_idx
+
+    def getNearestPoint(self, x, y, z):
+        _, nearest_point_idx = self.getNearestPointInfo(x, y, z)
+        if nearest_point_idx is None:
+            return None
+        return self.point_list[nearest_point_idx]
+
+    def getNearestChannelValueListValue(self, x, y, z, channel_name_list):
+        nearest_channel_value_list = []
+        if len(channel_name_list) == 0:
+            return nearest_channel_value_list
+        nearest_point = self.getNearestPoint(x, y, z)
+        if nearest_point is None:
+            return None
+        for channel_name in channel_name_list:
+            nearest_channel_value_list.append(
+                nearest_point.getChannelValue(channel_name))
+        return nearest_channel_value_list
+
+    def copyChannelValue(self, target_pointcloud, channel_name_list):
+        pointcloud_size = len(self.point_list)
+        target_pointcloud_size = len(target_pointcloud.point_list)
+        if target_pointcloud_size == 0:
+            print("ChannelPointCloud::copyChannelValue :")
+            print("target pointcloud is empty!")
+            return False
+
+        if pointcloud_size > 0 and pointcloud_size != target_pointcloud_size:
+            print("ChannelPointCloud::copyChannelValue :")
+            print("pointcloud size not matched!")
+            return False
+
+        first_point_channel_value_list = \
+            target_pointcloud.point_list[0].getChannelValueList(channel_name_list)
+        if None in first_point_channel_value_list:
+            print("ChannelPointCloud::copyChannelValue :")
+            print("target_pointcloud doesn't have all channels needed!")
+            return False
+
+        print("start copy channel value...")
+        channel_list_value_list = \
+            target_pointcloud.getChannelListValueList(channel_name_list)
+
+        if pointcloud_size == 0:
+            for channel_value_list in tqdm(channel_list_value_list):
+                new_point = ChannelPoint()
+                new_point.setChannelValueList(channel_name_list, channel_value_list)
+                self.point_list.append(new_point)
+            return True
+
+        for i in tqdm(pointcloud_size):
+            channel_value_list = channel_list_value_list[i]
+            self.point_list[i].setChannelValueList(channel_name_list, channel_value_list)
+        return True
+
+    def setChannelValueByKDTree(self, target_pointcloud, channel_name_list):
+        if len(self.point_list) == 0:
+            return True
+
+        if len(target_pointcloud.point_list) == 0:
+            print("ChannelPointCloud::setChannelValueByKDTree :")
+            print("target pointcloud is empty!")
+            return False
+
+        first_point_xyz = self.point_list[0].getChannelValueList(["x", "y", "z"])
+        if None in first_point_xyz:
+            print("ChannelPointCloud::setChannelValueByKDTree :")
+            print("pointcloud xyz not found!")
+            return False
+
+        first_point_channel_value_list = \
+            target_pointcloud.getNearestChannelValueListValue(
+                first_point_xyz[0],
+                first_point_xyz[1],
+                first_point_xyz[2],
+                channel_name_list)
+        if None in first_point_channel_value_list:
+            print("ChannelPointCloud::setChannelValueByKDTree :")
+            print("target_pointcloud doesn't have all channels needed!")
+            return False
+
+        print("start set channel value by KDTree...")
+        for point in tqdm(self.point_list):
+            xyz = point.getChannelValueList(["x", "y", "z"])
+            channel_value_list = \
+                target_pointcloud.getNearestChannelValueListValue(xyz[0],
+                                                                  xyz[1],
+                                                                  xyz[2],
+                                                                  channel_name_list)
+            point.setChannelValueList(channel_name_list, channel_value_list)
         return True
 
     def getPCDHeader(self):
@@ -208,8 +319,7 @@ class ChannelPointCloud(object):
         if point_num > 0:
             channel_list = self.point_list[0].channel_list
 
-        pcd_header = ""
-        pcd_header += "# .PCD v0.7 - Point Cloud Data file format\n"
+        pcd_header = "# .PCD v0.7 - Point Cloud Data file format\n"
         pcd_header += "VERSION 0.7\n"
 
         pcd_header += "FIELDS"
@@ -256,4 +366,34 @@ class ChannelPointCloud(object):
                     else:
                         f.write("\n")
         return True
+
+    def outputInfo(self, info_level=0):
+        line_start = "\t" * info_level
+        print(line_start + "ChannelPointCloud:")
+        for point in self.point_list:
+            point.outputInfo(info_level + 1)
+        return True
+
+def demo():
+    source_pointcloud = ChannelPointCloud()
+
+    source_pointcloud.loadData("./masked_pc/home/home_cut.ply",
+                               ["x", "y", "z", "r", "g", "b"],
+                               [0, 1, 2, 3, 4, 5])
+
+    label_pointcloud = ChannelPointCloud()
+    label_pointcloud.loadData("./masked_pc/home/home_DownSample_8_masked.pcd",
+                              ["x", "y", "z", "instance_label"],
+                              [0, 1, 2, 4])
+
+    merge_pointcloud = ChannelPointCloud()
+
+    merge_pointcloud.copyChannelValue(source_pointcloud, ["x", "y", "z", "r", "g", "b"])
+    merge_pointcloud.setChannelValueByKDTree(label_pointcloud, ["instance_label"])
+
+    merge_pointcloud.savePointCloud("./test.pcd")
+    return True
+
+if __name__ == "__main__":
+    demo()
 
