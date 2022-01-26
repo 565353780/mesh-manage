@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 
 from PointCloudClass.channel_pointcloud import ChannelPointCloud
+from PointCloudClass.trans_format import transToPLY
 
 # Param
 pointcloud_file_path = "./masked_pc/front_3d/01_masked.pcd"
 channel_name_list = ["x", "y", "z", "label"]
 channel_idx_list = [0, 1, 2, 7]
 label_channel_name = "label"
-save_pointcloud_file_path = "./masked_pc/front_3d/01_masked_painted.pcd"
 
 d3_40_colors_rgb = [
     [164, 218, 252], [120, 173, 219], [253, 147, 81], [252, 234, 163], [0, 128, 128],
@@ -20,9 +20,16 @@ d3_40_colors_rgb = [
     [231, 186, 82], [231, 203, 148], [132, 60, 57], [173, 73, 74], [214, 97, 107],
     [231, 150, 156], [123, 65, 115], [165, 81, 148], [206, 109, 189], [222, 158, 214]]
 
+estimate_normals_radius = 0.05
+estimate_normals_max_nn = 30
+
 # Process
+painted_pointcloud_file_path = pointcloud_file_path[:-4] + "_painted.pcd"
+
 pointcloud = ChannelPointCloud()
 pointcloud.loadData(pointcloud_file_path, channel_name_list, channel_idx_list)
 pointcloud.paintByLabel(label_channel_name, d3_40_colors_rgb)
-pointcloud.savePointCloud(save_pointcloud_file_path)
+pointcloud.savePointCloud(painted_pointcloud_file_path)
+
+transToPLY(painted_pointcloud_file_path, estimate_normals_radius, estimate_normals_max_nn)
 

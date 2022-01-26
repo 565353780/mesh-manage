@@ -5,11 +5,11 @@ from PointCloudClass.channel_pointcloud import ChannelPointCloud
 from PointCloudClass.trans_format import transToPLY
 
 # Param
-xyz_pointcloud_file_path = "./masked_pc/home/home_cut.ply"
+xyz_pointcloud_file_path = "./masked_pc/f14/f14_cut.ply"
 xyz_pointcloud_channel_name_list = ["x", "y", "z"]
 xyz_pointcloud_channel_idx_list = [0, 1, 2]
 
-label_pointcloud_file_path = "./masked_pc/home/home_DownSample_8_masked.pcd"
+label_pointcloud_file_path = "./masked_pc/f14/f14_cut_DownSample_8_masked.pcd"
 label_pointcloud_channel_name_list = ["x", "y", "z", "label"]
 label_pointcloud_channel_idx_list = [0, 1, 2, 4]
 label_channel_name = "label"
