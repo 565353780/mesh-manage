@@ -4,10 +4,11 @@
 from tqdm import tqdm
 from PointCloudClass.channel_pointcloud import ChannelPointCloud
 
+# Param
 pointcloud_file_path = "./test.pcd"
-channel_name_list = ["x", "y", "z", "instance_label"]
+channel_name_list = ["x", "y", "z", "label"]
 channel_idx_list = [0, 1, 2, 7]
-label_channel_name = "instance_label"
+label_channel_name = "label"
 save_pointcloud_file_path = "./test_paint.pcd"
 
 d3_40_colors_rgb = [
@@ -20,10 +21,9 @@ d3_40_colors_rgb = [
     [231, 186, 82], [231, 203, 148], [132, 60, 57], [173, 73, 74], [214, 97, 107],
     [231, 150, 156], [123, 65, 115], [165, 81, 148], [206, 109, 189], [222, 158, 214]]
 
+# Process
 pointcloud = ChannelPointCloud()
-pointcloud.loadData(pointcloud_file_path,
-                            channel_name_list,
-                            channel_idx_list)
+pointcloud.loadData(pointcloud_file_path, channel_name_list, channel_idx_list)
 
 print("start paint pointcloud...")
 for point in tqdm(pointcloud.point_list):
