@@ -38,7 +38,7 @@ class ChannelPointCloud(object):
         xyz_list = self.getChannelListValueList(["x", "y", "z"])
         if len(xyz_list) == 0:
             return False
-        if xyz_list[0][0] is None:
+        if None in xyz_list[0]:
             return False
         self.kd_tree = KDTree(xyz_list)
         return True
@@ -182,6 +182,8 @@ class ChannelPointCloud(object):
         for i in tqdm(pointcloud_size):
             channel_value_list = channel_list_value_list[i]
             self.point_list[i].setChannelValueList(channel_name_list, channel_value_list)
+
+        self.updateKDTree()
         return True
 
     def setChannelValueByKDTree(self, target_pointcloud, channel_name_list):
@@ -227,9 +229,15 @@ class ChannelPointCloud(object):
         return True
 
     def removeOutlierPoints(self, dist_max):
+        if self.kd_tree is None:
+            print("[ERROR][ChannelPointCloud::removeOutlierPoints]")
+            print("\t kd_tree is None!")
+            return False
+
         if dist_max == 0:
-            self.reset()
-            return True
+            print("[ERROR][ChannelPointCloud::removeOutlierPoints]")
+            print("\t dist_max is 0!")
+            return False
 
         print("[INFO][ChannelPointCloud::removeOutlierPoints]")
         print("\t start remove outerlier points with dist_max = " + str(dist_max) + "...")
@@ -244,6 +252,32 @@ class ChannelPointCloud(object):
             self.point_list.pop(remove_point_idx_list[i] - i)
         print("[INFO][ChannelPointCloud::removeOutlierPoints]")
         print("\t removed " + str(len(remove_point_idx_list)) + " points...")
+        return True
+
+    def paintByLabel(self, label_channel_name, color_map):
+        if len(self.point_list) == 0:
+            return True
+
+        first_point_label_value_list = self.point_list[0].getChannelValue(label_channel_name)
+
+        if None in first_point_label_value_list:
+            print("[ERROR][ChannelPointCloud::paintByLabel]")
+            print("\t label_channel not found!")
+            return False
+
+        color_map_size = len(color_map)
+
+        if color_map_size == 0:
+            print("[ERROR][ChannelPointCloud::paintByLabel]")
+            print("\t color_map is empty!")
+            return False
+
+        print("[INFO][ChannelPointCloud::paintByLabel]")
+        print("\t start paint by label...")
+        for point in tqdm(self.point_list):
+            label_value = point.getChannelValue(label_channel_name)
+            rgb = color_map[label_value % color_map_size]
+            point.setChannelValueList(["r", "g", "b"], rgb)
         return True
 
     def getPCDHeader(self):

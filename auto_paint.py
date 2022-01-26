@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from tqdm import tqdm
 from PointCloudClass.channel_pointcloud import ChannelPointCloud
 from PointCloudClass.trans_format import transToPLY
 
@@ -44,10 +43,7 @@ merge_pointcloud.copyChannelValue(xyz_pointcloud, ["x", "y", "z"])
 merge_pointcloud.setChannelValueByKDTree(label_pointcloud, ["label"])
 merge_pointcloud.removeOutlierPoints(0.05)
 
-for point in tqdm(merge_pointcloud.point_list):
-    label_value = point.getChannelValue(label_channel_name)
-    rgb = d3_40_colors_rgb[label_value % len(d3_40_colors_rgb)]
-    point.setChannelValueList(["r", "g", "b"], rgb)
+merge_pointcloud.paintByLabel(label_channel_name, d3_40_colors_rgb)
 painted_pointcloud_file_path = xyz_pointcloud_file_path[:-4] + "_painted.pcd"
 merge_pointcloud.savePointCloud(painted_pointcloud_file_path)
 

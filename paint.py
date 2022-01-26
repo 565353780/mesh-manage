@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from tqdm import tqdm
 from PointCloudClass.channel_pointcloud import ChannelPointCloud
 
 # Param
@@ -24,12 +23,6 @@ d3_40_colors_rgb = [
 # Process
 pointcloud = ChannelPointCloud()
 pointcloud.loadData(pointcloud_file_path, channel_name_list, channel_idx_list)
-
-print("start paint pointcloud...")
-for point in tqdm(pointcloud.point_list):
-    label_value = point.getChannelValue(label_channel_name)
-    rgb = d3_40_colors_rgb[label_value % len(d3_40_colors_rgb)]
-    point.setChannelValueList(["r", "g", "b"], rgb)
-
+pointcloud.paintByLabel(label_channel_name, d3_40_colors_rgb)
 pointcloud.savePointCloud(save_pointcloud_file_path)
 
