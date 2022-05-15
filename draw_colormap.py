@@ -5,8 +5,6 @@ import os
 import numpy as np
 import open3d as o3d
 
-from GRNetDetector.GRNet_Detector import GRNet_Detector
-
 red_white_color_map = np.array([
     [255, 255, 255],
     [228, 177, 171], [228, 177, 171],
@@ -149,18 +147,9 @@ def getHeatMap():
     return True
 
 def demo():
-    model_path = os.environ['HOME'] + "/.ros/GRNet-ShapeNet.pth"
-    pcd_file_path = "/home/chli/chLi/2022_5_9_18-35-42/scan12.ply"
-
-    grnet_detector = GRNet_Detector()
-    grnet_detector.load_model(model_path)
-    pointcloud_result = grnet_detector.detect_pcd_file(pcd_file_path)
-
-    complete_pointcloud = o3d.geometry.PointCloud()
-    complete_pointcloud.points = o3d.utility.Vector3dVector(pointcloud_result)
+    getHeatMap()
     return True
 
 if __name__ == "__main__":
-    #  demo()
-    getHeatMap()
+    demo()
 
