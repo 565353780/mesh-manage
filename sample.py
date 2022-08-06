@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from PointCloudClass.down_sample import downSample
+from Method.down_sample import downSample
 
 # Param
 pointcloud_file_path = "./masked_pc/home/home_cut.pcd"

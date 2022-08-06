@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from PointCloudClass.renderer import render
+from Method.render import render
 
 # Param
 pointcloud_file_path = "./masked_pc/office/office_cut_painted.ply"

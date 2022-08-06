@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from PointCloudClass.channel_pointcloud import ChannelPointCloud
-from PointCloudClass.trans_format import transToPLY
+from Data.channel_pointcloud import ChannelPointCloud
+from Method.trans_format import transToPLY
 
 # Param
 xyz_pointcloud_file_path = "./masked_pc/home/home_cut.pcd"

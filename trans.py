@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from PointCloudClass.trans_format import transToPLY
+from Method.trans_format import transToPLY
 
 # Param
 source_pointcloud_file_path = "./masked_pc/office/office_cut.pcd"

@@ -1,31 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
 import numpy as np
 import open3d as o3d
 
-red_white_color_map = np.array([
-    [255, 255, 255],
-    [228, 177, 171], [228, 177, 171],
-    [227, 150, 149], [227, 150, 149],
-    [223, 115, 115], [223, 115, 115],
-    [218, 85, 82],
-    [204, 68, 75], [204, 68, 75],
-    [204, 68, 75], [204, 68, 75],
-], dtype=np.float)
-
-red_blue_color_map = np.array([
-    [179, 222, 226],
-    [234, 242, 215],
-    [239, 207, 227],
-    [234, 154, 178],
-    [226, 115, 150], [226, 115, 150],
-    [226, 115, 150], [226, 115, 150],
-    [226, 115, 150], [226, 115, 150],
-    [226, 115, 150], [226, 115, 150],
-    [226, 115, 150], [226, 115, 150],
-], dtype=np.float)
+from Config.color import red_white_color_map, red_blue_color_map
 
 COLOR_MAP = red_white_color_map
 
