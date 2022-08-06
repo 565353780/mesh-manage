@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import os
-from scipy.spatial.kdtree import KDTree
 from tqdm import tqdm
+from scipy.spatial.kdtree import KDTree
 
 from Data.channel_point import ChannelPoint
 
