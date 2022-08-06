@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from PointCloudClass.channel import Channel
+from Data.channel import Channel
 
 class ChannelPoint(object):
     def __init__(self):
@@ -64,7 +64,7 @@ class ChannelPoint(object):
 
     def outputInfo(self, info_level=0):
         line_start = "\t" * info_level
-        print(line_start + "[INFO][ChannelPoint]")
+        print(line_start + "[ChannelPoint]")
         for channel in self.channel_list:
             channel.outputInfo(info_level + 1)
         return True

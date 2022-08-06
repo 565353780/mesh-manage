@@ -53,7 +53,7 @@ class Channel(object):
 
     def outputInfo(self, info_level=0):
         line_start = "\t" * info_level
-        print(line_start + "[INFO][Channel]")
+        print(line_start + "[Channel]")
         print(line_start + "\t name: " + self.name)
         print(line_start + "\t value: " + str(self.value))
         print(line_start + "\t size: " + str(self.size))

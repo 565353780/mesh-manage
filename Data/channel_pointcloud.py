@@ -5,7 +5,7 @@ import os
 from scipy.spatial.kdtree import KDTree
 from tqdm import tqdm
 
-from PointCloudClass.channel_point import ChannelPoint
+from Data.channel_point import ChannelPoint
 
 class ChannelPointCloud(object):
     def __init__(self):
