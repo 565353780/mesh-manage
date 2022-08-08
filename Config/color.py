@@ -21,7 +21,7 @@ red_white_color_map = np.array([
     [218, 85, 82],
     [204, 68, 75], [204, 68, 75],
     [204, 68, 75], [204, 68, 75],
-], dtype=np.float)
+], dtype=float)
 
 red_blue_color_map = np.array([
     [179, 222, 226],
@@ -33,5 +33,5 @@ red_blue_color_map = np.array([
     [226, 115, 150], [226, 115, 150],
     [226, 115, 150], [226, 115, 150],
     [226, 115, 150], [226, 115, 150],
-], dtype=np.float)
+], dtype=float)
 
