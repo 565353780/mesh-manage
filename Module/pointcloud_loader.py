@@ -82,5 +82,6 @@ def demo():
 
     pointcloud_loader = PointCloudLoader()
     pointcloud_loader.loadData(pointcloud_file_path)
+    pointcloud_loader.channel_pointcloud.outputInfo()
     return True
 
