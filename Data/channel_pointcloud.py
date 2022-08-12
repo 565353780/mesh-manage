@@ -323,8 +323,8 @@ class ChannelPointCloud(object):
         line_start = "\t" * info_level
         print(line_start + "[ChannelPointCloud]")
         print(line_start + "\t channel_point num =", len(self.channel_point_list))
-        print(line_start + "\t channel_point channel =")
         if len(self.channel_point_list) > 0:
+            print(line_start + "\t channel_point channel =")
             self.channel_point_list[0].outputInfo(info_level + 1)
         return True
 
