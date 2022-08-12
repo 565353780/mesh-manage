@@ -51,6 +51,9 @@ class ChannelPointCloud(object):
         self.xyz_changed = False
         return True
 
+    def addPoint(self, point):
+        return True
+
     def loadData(self, pointcloud_file_path):
         if not os.path.exists(pointcloud_file_path):
             print("[ERROR][ChannelPointCloud::loadData]")

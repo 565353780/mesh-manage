@@ -30,8 +30,8 @@ class ChannelMesh(object):
 
         o3d_mesh = o3d.io.read_triangle_mesh(obj_file_path)
         points = np.asarray(o3d_mesh.vertices)
-        print(points.shape)
-        print(points.dtype)
+        for point in points:
+            self.channel_pointcloud.addPoint
 
         return True
 
