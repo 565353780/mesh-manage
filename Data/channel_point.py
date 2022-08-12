@@ -4,8 +4,10 @@
 from Data.channel import Channel
 
 class ChannelPoint(object):
-    def __init__(self):
+    def __init__(self, channel_name_list=[], channel_value_list=[]):
         self.channel_list = []
+
+        self.setChannelValueList(channel_name_list, channel_value_list)
         return
 
     def updateFloatRGB(self):
