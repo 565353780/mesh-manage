@@ -6,7 +6,7 @@ import open3d as o3d
 
 def transFormat(source_pointcloud_file_path,
                 target_pointcloud_file_path,
-                need_estimate_normals=False,
+                need_estimate_normals=True,
                 estimate_normals_radius=0.05,
                 estimate_normals_max_nn=30):
     if not os.path.exists(source_pointcloud_file_path):
