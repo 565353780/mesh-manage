@@ -77,6 +77,10 @@ class PointCloudLoader(object):
         return True
 
 def demo():
+    pointcloud_file_path = \
+        "/home/chli/cad_ws/build/pcl_catkin/pcl_src-prefix/src/pcl_src/test/2d/canny.ply"
+
     pointcloud_loader = PointCloudLoader()
+    pointcloud_loader.loadData(pointcloud_file_path)
     return True
 
