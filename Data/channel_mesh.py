@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import numpy as np
 import open3d as o3d
 
 from Data.channel_pointcloud import ChannelPointCloud
@@ -28,8 +29,9 @@ class ChannelMesh(object):
             return False
 
         o3d_mesh = o3d.io.read_triangle_mesh(obj_file_path)
-        points = o3d_mesh.vertices().numpy()
+        points = np.asarray(o3d_mesh.vertices)
         print(points.shape)
+        print(points.dtype)
 
         return True
 
