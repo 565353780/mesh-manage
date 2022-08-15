@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from Data.face import Face
+
 class FaceSet(object):
     def __init__(self):
         self.face_list = []
@@ -27,7 +29,9 @@ class FaceSet(object):
             return False
         return True
 
-    def addFace(self, face, no_repeat=False):
+    def addFace(self, point_idx_list, no_repeat=False):
+        face = Face(point_idx_list[0], point_idx_list[1], point_idx_list[2])
+
         if no_repeat:
             if self.isHaveFace(face):
                 return True
