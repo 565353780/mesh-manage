@@ -29,12 +29,14 @@ class ChannelPoint(object):
         for exist_channel in self.channel_list:
             if exist_channel.name == channel_name:
                 exist_channel.setValue(channel_value)
-                self.updateFloatRGB()
+                if channel_name != "rgb":
+                    self.updateFloatRGB()
                 return True
 
         new_channel = Channel(channel_name, channel_value)
         self.channel_list.append(new_channel)
-        self.updateFloatRGB()
+        if channel_name != "rgb":
+            self.updateFloatRGB()
         return True
 
     def setChannelValueList(self, channel_name_list, channel_value_list):
