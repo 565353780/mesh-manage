@@ -24,17 +24,55 @@ class ChannelMesh(object):
     def getChannelPoint(self, channel_point_idx):
         return self.channel_pointcloud.getChannelPoint(channel_point_idx)
 
-    def getFilterChannelPointCloud(self, point_idx_list):
-        return self.channel_pointcloud.getFilterChannelPointCloud(point_idx_list)
-
     def addFace(self, point_idx_list):
         return self.face_set.addFace(point_idx_list)
 
     def getFace(self, face_idx):
         return self.face_set.getFace(face_idx)
 
-    def getMappingFaceSet(self, face_idx_list, mapping_dict):
-        return self.face_set.getMappingFaceSet(face_idx_list, mapping_dict)
+    def getFaceIdxListInPointIdxList(self, point_idx_list):
+        return self.face_set.getFaceIdxListInPointIdxList(point_idx_list)
+
+    def getPointIdxListFromFaceIdxList(self, face_idx_list):
+        return self.face_set.getPointIdxListAndMappingDict(face_idx_list)[0]
+
+    def getChannelMeshByFace(self, face_idx_list):
+        point_idx_list, mapping_dict = self.face_set.getPointIdxListAndMappingDict(face_idx_list)
+        if point_idx_list is None or mapping_dict is None:
+            print("[ERROR][ChannelMesh::getChannelMeshByFace]")
+            print("\t getPointIdxListAndMappingDict failed!")
+            return None
+
+        channel_pointcloud = self.channel_pointcloud.getFilterChannelPointCloud(point_idx_list)
+        if channel_pointcloud is None:
+            print("[ERROR][ChannelMesh::getChannelMeshByFace]")
+            print("\t getFilterChannelPointCloud failed!")
+            return None
+
+        face_set = self.face_set.getMappingFaceSet(face_idx_list, mapping_dict)
+        if face_set is None:
+            print("[ERROR][ChannelMesh::getChannelMeshByFace]")
+            print("\t getMappingFaceSet failed!")
+            return None
+
+        channel_mesh = ChannelMesh(channel_pointcloud, face_set)
+        return channel_mesh
+
+    def getChannelMeshByPoint(self, point_idx_list):
+        channel_pointcloud = self.channel_pointcloud.getFilterChannelPointCloud(point_idx_list)
+        if channel_pointcloud is None:
+            print("[ERROR][ChannelMesh::getChannelMeshByPoint]")
+            print("\t getFilterChannelPointCloud failed!")
+            return None
+
+        face_set = self.face_set.getFaceSetInPointIdxList(point_idx_list)
+        if face_set is None:
+            print("[ERROR][ChannelMesh::getChannelMeshByPoint]")
+            print("\t getFaceSetInPointIdxList failed!")
+            return None
+
+        channel_mesh = ChannelMesh(channel_pointcloud, face_set)
+        return channel_mesh
 
     def outputInfo(self, info_level=0):
         line_start = "\t" * info_level
