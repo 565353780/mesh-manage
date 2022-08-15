@@ -117,16 +117,22 @@ class PointCloudLoader(object):
                 print("[ERROR][PointCloudLoader::loadData]")
                 print("\t loadPCD failed!")
                 return False
+
+            self.channel_pointcloud.updateKDTree()
             return True
+
         if pointcloud_file_path[-4:] == ".ply":
             if not self.loadPLY(pointcloud_file_path):
                 print("[ERROR][PointCloudLoader::loadData]")
                 print("\t loadPLY failed!")
                 return False
+
+            self.channel_pointcloud.updateKDTree()
             return True
 
-        self.channel_pointcloud.updateKDTree()
-        return True
+        print("[ERROR][PointCloudLoader::loadData]")
+        print("\t pointcloud_file type not valid!")
+        return False
 
 def demo():
     pointcloud_file_path = \
