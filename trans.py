@@ -7,9 +7,8 @@ from Method.trans_format import transFormat
 source_pointcloud_file_path = \
     "/home/chli/chLi/OBJs/OpenGL/bunny_1.ply"
 target_pointcloud_file_path = \
-    "/home/chli/chLi/OBJs/OpenGL/bunny_1.pcd"
+    "/home/chli/chLi/OBJs/OpenGL/bunny_2.ply"
 
 # Process
 transFormat(source_pointcloud_file_path, target_pointcloud_file_path)
-#  transFormat(source_pointcloud_file_path, source_pointcloud_file_path)
 
