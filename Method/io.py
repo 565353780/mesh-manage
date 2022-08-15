@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
+import numpy as np
+import open3d as o3d
+
 from Method.path import getValidFilePath
 
 def loadPCD(pcd_file_path):
@@ -55,7 +59,7 @@ def loadPCD(pcd_file_path):
 
     return channel_name_list, channel_value_list_list
 
-def loadPLY(ply_file_path, load_point_only=False):
+def loadPLY(ply_file_path, load_point_only):
     valid_file_path = getValidFilePath(ply_file_path)
     if valid_file_path is None:
         print("[ERROR][io::loadPLY]")
@@ -138,11 +142,44 @@ def loadPLY(ply_file_path, load_point_only=False):
 
     return channel_name_list, channel_value_list_list, point_idx_list_list
 
+def loadOBJ(obj_file_path, load_point_only):
+    if not os.path.exists(obj_file_path):
+        print("[ERROR][ChannelMesh::loadOBJFile]")
+        print("\t obj_file not exist!")
+        return False
+
+    channel_name_list = [
+        "x", "y", "z",
+        "r", "g", "b"
+    ]
+
+    channel_value_list_list = []
+
+    o3d_mesh = o3d.io.read_triangle_mesh(obj_file_path)
+    points = np.asarray(o3d_mesh.vertices)
+    colors = np.round(np.asarray(o3d_mesh.vertex_colors) * 255)
+    channel_value_list_list = np.concatenate((points, colors), axis=1)
+
+    if load_point_only:
+        return channel_name_list, channel_value_list_list
+
+    faces = np.asarray(o3d_mesh.triangles)
+    point_idx_list_list = faces.tolist()
+    return channel_name_list, channel_value_list_list, point_idx_list_list
+
 def loadFileData(file_path, load_point_only=False):
     if file_path[-4:] == ".pcd":
         return loadPCD(file_path)
 
     if file_path[-4:] == ".ply":
         return loadPLY(file_path, load_point_only)
-    return
+
+    if file_path[-4:] == ".obj":
+        return loadOBJ(file_path, load_point_only)
+
+    print("[ERROR][io::loadFileData]")
+    print("\t file format not valid!")
+    if load_point_only:
+        return [], []
+    return [], [], []
 
