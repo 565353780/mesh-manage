@@ -30,7 +30,7 @@ class FaceSet(object):
         return True
 
     def addFace(self, point_idx_list, no_repeat=False):
-        face = Face(point_idx_list[0], point_idx_list[1], point_idx_list[2])
+        face = Face(point_idx_list)
 
         if no_repeat:
             if self.isHaveFace(face):
