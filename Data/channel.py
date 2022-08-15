@@ -26,7 +26,7 @@ class Channel(object):
             return True
 
         if self.name in [
-                "r", "g", "b", "rgb",
+                "r", "g", "b", "rgb", "red", "green", "blue",
                 "label", "semantic_label", "instance_label"]:
             self.size = 4
             self.type = "U"
