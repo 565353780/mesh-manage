@@ -21,6 +21,11 @@ class ChannelPointCloud(object):
         self.xyz_changed = True
         return True
 
+    def getChannelNameList(self):
+        if len(self.channel_point_list) == 0:
+            return []
+        return self.channel_point_list[0].getChannelNameList()
+
     def getChannelValueList(self, channel_name):
         channel_value_list = []
         for channel_point in self.channel_point_list:
@@ -55,6 +60,28 @@ class ChannelPointCloud(object):
         self.channel_point_list.append(channel_point)
         return True
 
+    def getChannelPoint(self, channel_point_idx):
+        if channel_point_idx >= len(self.channel_point_list):
+            print("[ERROR][ChannelPointCloud::getChannelPoint]")
+            print("\t channel_point_idx out of range!")
+            return None
+        return self.channel_point_list[channel_point_idx]
+
+    def getFilterChannelPointCloud(self, point_idx_list):
+        channel_name_list = self.getChannelNameList()
+        channel_pointcloud = ChannelPointCloud()
+
+        for channel_point_idx in point_idx_list:
+            channel_point = self.getChannelPoint(channel_point_idx)
+            if channel_point is None:
+                print("[ERROR][ChannelPointCloud::getChannelPointCloud]")
+                print("\t getChannelPoint failed!")
+                return None
+
+            channel_value_list = channel_point.getChannelValueList(channel_name_list)
+            channel_pointcloud.addChannelPoint(channel_name_list, channel_value_list)
+        return channel_pointcloud
+
     def getNearestPointInfo(self, x, y, z):
         self.updateKDTree()
 
@@ -75,16 +102,16 @@ class ChannelPointCloud(object):
         nearest_dist, _ = self.kd_tree.query([x, y, z])
         return nearest_dist
 
-    def getSelfNearestDist(self, point_idx):
+    def getSelfNearestDist(self, channel_point_idx):
         self.updateKDTree()
 
         if self.kd_tree is None:
             return None
         if len(self.channel_point_list) == 0:
             return None
-        if point_idx >= len(self.channel_point_list):
+        if channel_point_idx >= len(self.channel_point_list):
             return None
-        xyz = self.channel_point_list[point_idx].getChannelValueList(["x", "y", "z"])
+        xyz = self.channel_point_list[channel_point_idx].getChannelValueList(["x", "y", "z"])
         if None in xyz:
             return None
         nearest_dist_list, _ = self.kd_tree.query([xyz[0], xyz[1], xyz[2]], 2)
@@ -146,7 +173,7 @@ class ChannelPointCloud(object):
             self.updateKDTree()
             return True
 
-        for i in tqdm(pointcloud_size):
+        for i in tqdm(range(pointcloud_size)):
             channel_value_list = channel_list_value_list[i]
             self.channel_point_list[i].setChannelValueList(channel_name_list, channel_value_list)
 

@@ -44,6 +44,12 @@ class ChannelPoint(object):
             self.setChannelValue(channel_name_list[i], channel_value_list[i])
         return True
 
+    def getChannelNameList(self):
+        if len(self.channel_list) == 0:
+            return []
+        channel_name_list = [channel.name for channel in self.channel_list]
+        return channel_name_list
+
     def getChannelValue(self, channel_name):
         if len(self.channel_list) == 0:
             return None
@@ -55,9 +61,7 @@ class ChannelPoint(object):
         return None
 
     def getChannelValueList(self, channel_name_list):
-        channel_value_list = []
-        for channel_name in channel_name_list:
-            channel_value_list.append(self.getChannelValue(channel_name))
+        channel_value_list = [self.getChannelValue(channel_name) for channel_name in channel_name_list]
         return channel_value_list
 
     def outputInfo(self, info_level=0):
