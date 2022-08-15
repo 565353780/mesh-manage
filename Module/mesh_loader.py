@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
-import numpy as np
-import open3d as o3d
 from tqdm import tqdm
 
 from Data.channel_mesh import ChannelMesh
+
+from Method.io import loadFileData
 
 class MeshLoader(object):
     def __init__(self):
@@ -17,35 +16,33 @@ class MeshLoader(object):
         self.channel_mesh.reset()
         return True
 
-    def loadOBJ(self, obj_file_path):
-        if not os.path.exists(obj_file_path):
-            print("[ERROR][ChannelMesh::loadOBJFile]")
-            print("\t obj_file not exist!")
+    def loadData(self, mesh_file_path):
+        self.reset()
+
+        print("[INFO][MeshLoader::loadData]")
+        print("\t start load mesh :")
+        print("\t mesh_file_path =", mesh_file_path)
+
+        channel_name_list, channel_value_list_list, point_idx_list_list = loadFileData(mesh_file_path)
+        if channel_name_list == [] or channel_value_list_list == []:
+            print("[ERROR][MeshLoader::loadData]")
+            print("\t loadFileData failed!")
             return False
 
-        o3d_mesh = o3d.io.read_triangle_mesh(obj_file_path)
-        points = np.asarray(o3d_mesh.vertices)
-        colors = np.asarray(o3d_mesh.vertex_colors)
-        for point, color in tqdm(zip(points, colors), total=len(points)):
-            channel_name_list = [
-                "x", "y", "z",
-                "r", "g", "b"
-            ]
-            channel_value_list = [
-                point[0], point[1], point[2],
-                round(color[0] * 255), round(color[1] * 255), round(color[2] * 255)
-            ]
+        for channel_value_list in tqdm(channel_value_list_list):
             self.channel_mesh.addChannelPoint(channel_name_list, channel_value_list)
 
-        faces = np.asarray(o3d_mesh.triangles)
-        for face in tqdm(faces):
-            self.channel_mesh.addFace(face)
+        self.channel_mesh.updateKDTree()
+
+        if point_idx_list_list != []:
+            for point_idx_list in point_idx_list_list:
+                self.channel_mesh.addFace(point_idx_list)
         return True
 
 def demo():
     obj_file_path = "/home/chli/chLi/OBJs/OpenGL/bunny_1.obj"
 
     mesh_loader = MeshLoader()
-    mesh_loader.loadOBJ(obj_file_path)
+    mesh_loader.loadData(obj_file_path)
     return True
 
