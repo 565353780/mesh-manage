@@ -4,14 +4,14 @@
 import os
 import open3d as o3d
 
-def transFormat(source_pointcloud_file_path,
-                target_pointcloud_file_path,
-                need_estimate_normals=True,
-                estimate_normals_radius=0.05,
-                estimate_normals_max_nn=30):
+def transPointCloudFormat(source_pointcloud_file_path,
+                          target_pointcloud_file_path,
+                          need_estimate_normals=True,
+                          estimate_normals_radius=0.05,
+                          estimate_normals_max_nn=30):
     if not os.path.exists(source_pointcloud_file_path):
-        print("[ERROR][trans::transFormat]")
-        print("source_file not exist!")
+        print("[ERROR][trans::transPointCloudFormat]")
+        print("source_pointcloud_file not exist!")
         return False
 
     pointcloud = o3d.io.read_point_cloud(source_pointcloud_file_path, print_progress=True)
@@ -27,4 +27,38 @@ def transFormat(source_pointcloud_file_path,
         write_ascii=True,
         print_progress=True)
     return True
+
+def transMeshFormat(source_mesh_file_path,
+                    target_mesh_file_path,
+                    need_estimate_normals=True):
+    if not os.path.exists(source_mesh_file_path):
+        print("[ERROR][trans::transMeshFormat]")
+        print("source_mesh_file not exist!")
+        return False
+
+    mesh = o3d.io.read_triangle_mesh(source_mesh_file_path, print_progress=True)
+    if need_estimate_normals:
+        mesh.compute_vertex_normals()
+        mesh.compute_triangle_normals()
+
+    o3d.io.write_triangle_mesh(
+        target_mesh_file_path,
+        mesh,
+        write_ascii=True,
+        print_progress=True)
+    return True
+
+def transFormat(source_file_path,
+                target_file_path,
+                load_point_only=False,
+                need_estimate_normals=True,
+                estimate_normals_radius=0.05,
+                estimate_normals_max_nn=30):
+    if load_point_only:
+        return transPointCloudFormat(
+            source_file_path, target_file_path, need_estimate_normals,
+            estimate_normals_radius, estimate_normals_max_nn)
+
+    return transMeshFormat(
+        source_file_path, target_file_path, need_estimate_normals)
 
