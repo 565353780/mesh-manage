@@ -21,3 +21,6 @@ class ChannelMesh(object):
     def addFace(self, point_idx_list):
         return self.face_set.addFace(point_idx_list)
 
+    def updateKDTree(self):
+        return self.channel_pointcloud.updateKDTree()
+
