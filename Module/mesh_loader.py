@@ -40,30 +40,13 @@ class MeshLoader(object):
         return True
 
     def generateMeshByFace(self, face_idx_list):
-        point_idx_list = []
-        mapping_dict = {}
-
-        for face_idx in face_idx_list:
-            face = self.channel_mesh.getFace(face_idx)
-            if face is None:
-                print("[ERROR][MeshLoader::generateSubMesh]")
-                print("\t getFace failed!")
-                return False
-
-            for point_idx in face.point_idx_list:
-                if point_idx in point_idx_list:
-                    continue
-                mapping_dict[str(point_idx)] = len(point_idx_list)
-                point_idx_list.append(point_idx)
-
-        channel_pointcloud = self.channel_mesh.getFilterChannelPointCloud(point_idx_list)
-        face_set = self.channel_mesh.getMappingFaceSet(mapping_dict)
-
-        channel_mesh = ChannelMesh(channel_pointcloud, face_set)
+        channel_mesh = self.channel_mesh.getChannelMeshByFace(face_idx_list)
         channel_mesh.outputInfo(1)
         return True
 
     def generateMeshByPoint(self, point_idx_list):
+        channel_mesh = self.channel_mesh.getChannelMeshByPoint(point_idx_list)
+        channel_mesh.outputInfo(1)
         return True
 
 def demo():
@@ -73,6 +56,14 @@ def demo():
     mesh_loader.loadData(mesh_file_path)
 
     face_idx_list = [i for i in range(20)]
+
+    point_idx_list = mesh_loader.channel_mesh.getPointIdxListFromFaceIdxList(face_idx_list)
+    new_face_idx_list = mesh_loader.channel_mesh.getFaceIdxListInPointIdxList(point_idx_list)
+
     mesh_loader.generateMeshByFace(face_idx_list)
+    mesh_loader.generateMeshByFace(new_face_idx_list)
+    mesh_loader.generateMeshByPoint(point_idx_list)
+
+    print(new_face_idx_list)
     return True
 
