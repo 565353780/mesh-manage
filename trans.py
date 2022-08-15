@@ -5,11 +5,11 @@ from Method.trans_format import transFormat
 
 # Param
 source_pointcloud_file_path = \
-    "/home/chli/cad_ws/build/pcl_catkin/pcl_src-prefix/src/pcl_src/test/2d/canny.pcd"
+    "/home/chli/chLi/OBJs/OpenGL/bunny_1.ply"
 target_pointcloud_file_path = \
-    "/home/chli/cad_ws/build/pcl_catkin/pcl_src-prefix/src/pcl_src/test/2d/canny.ply"
+    "/home/chli/chLi/OBJs/OpenGL/bunny_1.pcd"
 
 # Process
 transFormat(source_pointcloud_file_path, target_pointcloud_file_path)
-transFormat(source_pointcloud_file_path, source_pointcloud_file_path)
+#  transFormat(source_pointcloud_file_path, source_pointcloud_file_path)
 

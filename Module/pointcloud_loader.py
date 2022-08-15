@@ -33,6 +33,8 @@ class PointCloudLoader(object):
         find_start_line = False
         for line in tqdm(lines):
             if "property" in line:
+                if "property list" in line:
+                    continue
                 channel_name = line.split("\n")[0].split(" ")[2]
                 channel_name_list.append(channel_name)
                 continue
@@ -48,7 +50,7 @@ class PointCloudLoader(object):
             if not find_start_line:
                 continue
 
-            line_data = line.split("\n")[0].split(" ")
+            line_data = line.split("\n")[0].split(" ")[:len(channel_name_list)]
 
             channel_value_list = []
             for i in range(len(channel_name_list)):
@@ -92,7 +94,7 @@ class PointCloudLoader(object):
             if not find_start_line:
                 continue
 
-            line_data = line.split("\n")[0].split(" ")
+            line_data = line.split("\n")[0].split(" ")[:len(channel_name_list)]
 
             channel_value_list = []
             for i in range(len(channel_name_list)):
@@ -136,7 +138,7 @@ class PointCloudLoader(object):
 
 def demo():
     pointcloud_file_path = \
-        "/home/chli/cad_ws/build/pcl_catkin/pcl_src-prefix/src/pcl_src/test/2d/canny.ply"
+        "/home/chli/chLi/OBJs/OpenGL/bunny_1.pcd"
 
     pointcloud_loader = PointCloudLoader()
     pointcloud_loader.loadData(pointcloud_file_path)
