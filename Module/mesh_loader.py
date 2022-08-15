@@ -27,12 +27,19 @@ class MeshLoader(object):
         points = np.asarray(o3d_mesh.vertices)
         colors = np.asarray(o3d_mesh.vertex_colors)
         for point, color in tqdm(zip(points, colors), total=len(points)):
-            color *= 255
-            channel_value_list = [point[0], point[1], point[2], round(color[0]), round(color[1]), round(color[2])]
-            self.channel_mesh.addChannelPoint(["x", "y", "z", "r", "g", "b"], channel_value_list)
+            channel_name_list = [
+                "x", "y", "z",
+                "r", "g", "b"
+            ]
+            channel_value_list = [
+                point[0], point[1], point[2],
+                round(color[0] * 255), round(color[1] * 255), round(color[2] * 255)
+            ]
+            self.channel_mesh.addChannelPoint(channel_name_list, channel_value_list)
 
-        #  faces = np.asarray(o3d_mesh.faces)
-        #  print(faces)
+        faces = np.asarray(o3d_mesh.triangles)
+        for face in tqdm(faces):
+            self.channel_mesh.addFace(face)
         return True
 
 def demo():
