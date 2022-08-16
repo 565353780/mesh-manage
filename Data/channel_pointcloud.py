@@ -32,21 +32,21 @@ class ChannelPointCloud(object):
             channel_value_list.append(channel_point.getChannelValue(channel_name))
         return channel_value_list
 
-    def getChannelListValueList(self, channel_name_list):
-        channel_list_value_list = []
+    def getChannelValueListList(self, channel_name_list):
+        channel_value_list_list = []
         for channel_point in self.channel_point_list:
             channel_value_list = []
             for channel_name in channel_name_list:
                 channel_value_list.append(channel_point.getChannelValue(channel_name))
-            channel_list_value_list.append(channel_value_list)
-        return channel_list_value_list
+            channel_value_list_list.append(channel_value_list)
+        return channel_value_list_list
 
     def updateKDTree(self):
         if not self.xyz_changed:
             return True
 
         self.kd_tree = None
-        xyz_list = self.getChannelListValueList(["x", "y", "z"])
+        xyz_list = self.getChannelValueListList(["x", "y", "z"])
         if len(xyz_list) == 0:
             return False
         if None in xyz_list[0]:
@@ -161,11 +161,11 @@ class ChannelPointCloud(object):
         for channel_name in channel_name_list:
             print(" " + channel_name, end="")
         print(" ]...")
-        channel_list_value_list = \
-            target_pointcloud.getChannelListValueList(channel_name_list)
+        channel_value_list_list = \
+            target_pointcloud.getChannelValueListList(channel_name_list)
 
         if pointcloud_size == 0:
-            for channel_value_list in tqdm(channel_list_value_list):
+            for channel_value_list in tqdm(channel_value_list_list):
                 new_point = ChannelPoint()
                 new_point.setChannelValueList(channel_name_list, channel_value_list)
                 self.channel_point_list.append(new_point)
@@ -174,7 +174,7 @@ class ChannelPointCloud(object):
             return True
 
         for i in tqdm(range(pointcloud_size)):
-            channel_value_list = channel_list_value_list[i]
+            channel_value_list = channel_value_list_list[i]
             self.channel_point_list[i].setChannelValueList(channel_name_list, channel_value_list)
 
         self.updateKDTree()
