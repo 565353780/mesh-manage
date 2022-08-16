@@ -5,7 +5,8 @@ import os
 import numpy as np
 import open3d as o3d
 
-from Method.path import getValidFilePath
+from Method.path import createFileFolder, getValidFilePath
+from Method.list import isListInList
 
 def loadPCD(pcd_file_path):
     valid_file_path = getValidFilePath(pcd_file_path)
@@ -182,4 +183,47 @@ def loadFileData(file_path, load_point_only=False):
     if load_point_only:
         return [], []
     return [], [], []
+
+def saveChannelMesh(channel_mesh, save_file_path):
+    if channel_mesh is None:
+        print("[ERROR][io::saveChannelMesh]")
+        print("\t channel_mesh is None!")
+        return False
+
+    createFileFolder(save_file_path)
+
+    channel_name_list = channel_mesh.channel_pointcloud.getChannelNameList()
+
+    if not isListInList(["x", "y", "z"], channel_name_list):
+        print("[ERROR][io::saveChannelMesh]")
+        print("\t xyz data not valid!")
+        return False
+
+    points = channel_mesh.channel_pointcloud.getChannelValueListList(["x", "y", "z"])
+    colors = []
+
+    if isListInList(["r", "g", "b"], channel_name_list):
+        colors = channel_mesh.channel_pointcloud.getChannelValueListList(["r", "g", "b"])
+    elif isListInList(["red", "green", "blue"], channel_name_list):
+        colors = channel_mesh.channel_pointcloud.getChannelValueListList(["red", "green", "blue"])
+    else:
+        print("[ERROR][io::saveChannelMesh]")
+        print("\t rgb data not valid!")
+        return False
+
+    faces = channel_mesh.face_set.getPointIdxListList()
+
+    o3d_mesh = o3d.geometry.TriangleMesh()
+    o3d_mesh.vertices = o3d.utility.Vector3dVector(np.array(points))
+    o3d_mesh.vertex_colors = o3d.utility.Vector3dVector(np.array(colors) / 255.0)
+    o3d_mesh.triangles = o3d.utility.Vector3iVector(np.array(faces))
+    o3d_mesh.compute_vertex_normals()
+    o3d_mesh.compute_triangle_normals()
+
+    o3d.io.write_triangle_mesh(
+        save_file_path,
+        o3d_mesh,
+        write_ascii=True,
+        print_progress=True)
+    return True
 

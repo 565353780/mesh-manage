@@ -4,6 +4,8 @@
 from Data.channel_pointcloud import ChannelPointCloud
 from Data.face_set import FaceSet
 
+from Method.io import saveChannelMesh
+
 class ChannelMesh(object):
     def __init__(self, channel_pointcloud=ChannelPointCloud(), face_set=FaceSet()):
         self.channel_pointcloud = channel_pointcloud
@@ -73,6 +75,13 @@ class ChannelMesh(object):
 
         channel_mesh = ChannelMesh(channel_pointcloud, face_set)
         return channel_mesh
+
+    def saveMesh(self, save_file_path):
+        if not saveChannelMesh(self, save_file_path):
+            print("[ERROR][ChannelMesh::saveMesh]")
+            print("\t saveChannelMesh failed!")
+            return False
+        return True
 
     def outputInfo(self, info_level=0):
         line_start = "\t" * info_level

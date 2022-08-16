@@ -98,6 +98,10 @@ class FaceSet(object):
             face_set.addFace(self.face_list[face_idx].point_idx_list)
         return face_set
 
+    def getPointIdxListList(self):
+        point_idx_list_list = [face.point_idx_list for face in self.face_list]
+        return point_idx_list_list
+
     def outputInfo(self, info_level=0):
         line_start = "\t" * info_level
         print(line_start + "[FaceSet]")
