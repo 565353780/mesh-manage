@@ -67,21 +67,13 @@ def demo():
     mesh_file_path = "/home/chli/scan2cad/scannet/scans/scene0474_02/scene0474_02_vh_clean_2.ply"
 
     mesh_loader = MeshLoader()
-    print("start loadData")
     mesh_loader.loadData(mesh_file_path)
-    print("finish loadData")
 
     face_idx_list = [i for i in range(20)]
 
-    print("start getPointIdxListFromFaceIdxList")
     point_idx_list = mesh_loader.channel_mesh.getPointIdxListFromFaceIdxList(face_idx_list)
-    print("finish getPointIdxListFromFaceIdxList")
-    print("start getFaceIdxListInPointIdxList")
-    new_face_idx_list = mesh_loader.channel_mesh.getFaceIdxListInPointIdxList(point_idx_list)
-    print("finish getFaceIdxListInPointIdxList")
 
-    mesh_loader.generateMeshByFace(face_idx_list, "/home/chli/chLi/channel_mesh/test11.ply")
-    mesh_loader.generateMeshByFace(new_face_idx_list, "/home/chli/chLi/channel_mesh/test12.ply")
+    mesh_loader.generateMeshByFace(face_idx_list, "/home/chli/chLi/channel_mesh/test1.ply")
     mesh_loader.generateMeshByPoint(point_idx_list, "/home/chli/chLi/channel_mesh/test2.ply")
     return True
 
