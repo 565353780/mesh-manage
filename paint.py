@@ -5,7 +5,7 @@ from Config.color import d3_40_colors_rgb
 
 from Data.channel_pointcloud import ChannelPointCloud
 
-from Method.trans_format import transToPLY
+from Method.trans import transToPLY
 
 # Param
 pointcloud_file_path = "./masked_pc/front_3d/04_masked.pcd"

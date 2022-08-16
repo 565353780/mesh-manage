@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from Method.trans_format import transFormat
+from Method.trans import transFormat
 
 # Param
 source_pointcloud_file_path = \

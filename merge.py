@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from Data.channel_pointcloud import ChannelPointCloud
-from Method.trans_format import transFormat
+from Method.trans import transFormat
 
 # Param
 xyz_pointcloud_file_path = "./masked_pc/home/home_cut.pcd"
