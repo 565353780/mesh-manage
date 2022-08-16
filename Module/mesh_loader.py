@@ -39,14 +39,28 @@ class MeshLoader(object):
                 self.channel_mesh.addFace(point_idx_list)
         return True
 
-    def generateMeshByFace(self, face_idx_list):
+    def generateMeshByFace(self, face_idx_list, save_file_path):
         channel_mesh = self.channel_mesh.getChannelMeshByFace(face_idx_list)
-        channel_mesh.outputInfo(1)
+        if channel_mesh is None:
+            print("[ERROR][MeshLoader::generateMeshByFace]")
+            print("\t getChannelMeshByFace failed!")
+            return False
+        if not channel_mesh.saveMesh(save_file_path):
+            print("[ERROR][MeshLoader::generateMeshByFace]")
+            print("\t saveMesh failed!")
+            return False
         return True
 
-    def generateMeshByPoint(self, point_idx_list):
+    def generateMeshByPoint(self, point_idx_list, save_file_path):
         channel_mesh = self.channel_mesh.getChannelMeshByPoint(point_idx_list)
-        channel_mesh.outputInfo(1)
+        if channel_mesh is None:
+            print("[ERROR][MeshLoader::generateMeshByPoint]")
+            print("\t getChannelMeshByPoint failed!")
+            return False
+        if not channel_mesh.saveMesh(save_file_path):
+            print("[ERROR][MeshLoader::generateMeshByPoint]")
+            print("\t saveMesh failed!")
+            return False
         return True
 
 def demo():
@@ -60,10 +74,8 @@ def demo():
     point_idx_list = mesh_loader.channel_mesh.getPointIdxListFromFaceIdxList(face_idx_list)
     new_face_idx_list = mesh_loader.channel_mesh.getFaceIdxListInPointIdxList(point_idx_list)
 
-    mesh_loader.generateMeshByFace(face_idx_list)
-    mesh_loader.generateMeshByFace(new_face_idx_list)
-    mesh_loader.generateMeshByPoint(point_idx_list)
-
-    print(new_face_idx_list)
+    mesh_loader.generateMeshByFace(face_idx_list, "/home/chli/chLi/channel_mesh/test11.obj")
+    mesh_loader.generateMeshByFace(new_face_idx_list, "/home/chli/chLi/channel_mesh/test12.obj")
+    #  mesh_loader.generateMeshByPoint(point_idx_list, "/home/chli/chLi/channel_mesh/test2.obj")
     return True
 
