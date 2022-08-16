@@ -8,8 +8,11 @@ from Data.channel_mesh import ChannelMesh
 from Method.io import loadFileData
 
 class MeshLoader(object):
-    def __init__(self):
+    def __init__(self, mesh_file_path=None):
         self.channel_mesh = ChannelMesh()
+
+        if mesh_file_path is not None:
+            self.loadData(mesh_file_path)
         return
 
     def reset(self):
@@ -66,8 +69,7 @@ class MeshLoader(object):
 def demo():
     mesh_file_path = "/home/chli/scan2cad/scannet/scans/scene0474_02/scene0474_02_vh_clean_2.ply"
 
-    mesh_loader = MeshLoader()
-    mesh_loader.loadData(mesh_file_path)
+    mesh_loader = MeshLoader(mesh_file_path)
 
     face_idx_list = [i for i in range(20)]
 
