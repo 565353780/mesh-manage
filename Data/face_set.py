@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from tqdm import tqdm
+
 from Data.face import Face
+
+from Method.pool import getFaceIdxListInPointIdxListWithPool
 
 class FaceSet(object):
     def __init__(self):
@@ -85,13 +89,19 @@ class FaceSet(object):
 
     def getFaceIdxListInPointIdxList(self, point_idx_list):
         face_idx_list = []
-        for i, face in enumerate(self.face_list):
+        print("[INFO][FaceSet::getFaceIdxListInPointIdxList]")
+        print("\t start check if is face in point_idx_list...")
+        for i, face in tqdm(enumerate(self.face_list), total=len(self.face_list)):
             if face.isInPointIdxList(point_idx_list):
                 face_idx_list.append(i)
         return face_idx_list
 
+    def getFaceIdxListInPointIdxListWithPool(self, point_idx_list):
+        return getFaceIdxListInPointIdxListWithPool(self.face_list, point_idx_list)
+
     def getFaceSetInPointIdxList(self, point_idx_list):
-        face_idx_list = self.getFaceIdxListInPointIdxList(point_idx_list)
+        #  face_idx_list = self.getFaceIdxListInPointIdxList(point_idx_list)
+        face_idx_list = self.getFaceIdxListInPointIdxListWithPool(point_idx_list)
 
         mapping_dict = {}
         used_point_idx_list = []
