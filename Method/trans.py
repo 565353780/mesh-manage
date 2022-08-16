@@ -6,6 +6,7 @@ import open3d as o3d
 
 def transPointCloudFormat(source_pointcloud_file_path,
                           target_pointcloud_file_path,
+                          print_progress=False,
                           need_estimate_normals=True,
                           estimate_normals_radius=0.05,
                           estimate_normals_max_nn=30):
@@ -25,11 +26,12 @@ def transPointCloudFormat(source_pointcloud_file_path,
         target_pointcloud_file_path,
         pointcloud,
         write_ascii=True,
-        print_progress=True)
+        print_progress=print_progress)
     return True
 
 def transMeshFormat(source_mesh_file_path,
                     target_mesh_file_path,
+                    print_progress=False,
                     need_estimate_normals=True):
     if not os.path.exists(source_mesh_file_path):
         print("[ERROR][trans::transMeshFormat]")
@@ -45,20 +47,21 @@ def transMeshFormat(source_mesh_file_path,
         target_mesh_file_path,
         mesh,
         write_ascii=True,
-        print_progress=True)
+        print_progress=print_progress)
     return True
 
 def transFormat(source_file_path,
                 target_file_path,
                 load_point_only=False,
+                print_progress=False,
                 need_estimate_normals=True,
                 estimate_normals_radius=0.05,
                 estimate_normals_max_nn=30):
     if load_point_only:
         return transPointCloudFormat(
-            source_file_path, target_file_path, need_estimate_normals,
-            estimate_normals_radius, estimate_normals_max_nn)
+            source_file_path, target_file_path, print_progress,
+            need_estimate_normals, estimate_normals_radius, estimate_normals_max_nn)
 
     return transMeshFormat(
-        source_file_path, target_file_path, need_estimate_normals)
+        source_file_path, target_file_path, print_progress, need_estimate_normals)
 
