@@ -2,11 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from Data.channel_pointcloud import ChannelPointCloud
-from Method.trans_format import transToPLY
+from Method.trans_format import transFormat
 
 # Param
 xyz_pointcloud_file_path = "./masked_pc/home/home_cut.pcd"
-
 label_pointcloud_file_path = "./masked_pc/home/home_DownSample_8_masked.pcd"
 
 outlier_dist_max = 0.05
@@ -28,5 +27,5 @@ merge_pointcloud.setChannelValueByKDTree(label_pointcloud, ["label"])
 merge_pointcloud.removeOutlierPoints(outlier_dist_max)
 merge_pointcloud.savePointCloud(merged_pointcloud_file_path)
 
-transToPLY(merged_pointcloud_file_path, estimate_normals_radius, estimate_normals_max_nn)
+transFormat(merged_pointcloud_file_path, merged_pointcloud_file_path[:-4] + ".ply")
 
