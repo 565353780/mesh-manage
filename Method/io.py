@@ -198,10 +198,9 @@ def saveChannelMesh(channel_mesh, save_file_path):
         print("[ERROR][io::saveChannelMesh]")
         print("\t xyz data not valid!")
         return False
-
     points = channel_mesh.channel_pointcloud.getChannelValueListList(["x", "y", "z"])
-    colors = []
 
+    colors = []
     if isListInList(["r", "g", "b"], channel_name_list):
         colors = channel_mesh.channel_pointcloud.getChannelValueListList(["r", "g", "b"])
     elif isListInList(["red", "green", "blue"], channel_name_list):

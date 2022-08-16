@@ -93,9 +93,19 @@ class FaceSet(object):
     def getFaceSetInPointIdxList(self, point_idx_list):
         face_idx_list = self.getFaceIdxListInPointIdxList(point_idx_list)
 
-        face_set = FaceSet()
-        for face_idx in face_idx_list:
-            face_set.addFace(self.face_list[face_idx].point_idx_list)
+        mapping_dict = {}
+        used_point_idx_list = []
+        for point_idx in point_idx_list:
+            if point_idx in used_point_idx_list:
+                continue
+            mapping_dict[str(point_idx)] = len(used_point_idx_list)
+            used_point_idx_list.append(point_idx)
+
+        face_set = self.getMappingFaceSet(face_idx_list, mapping_dict)
+        if face_set is None:
+            print("[ERROR][FaceSet::getFaceSetInPointIdxList]")
+            print("\t getMappingFaceSet failed!")
+            return None
         return face_set
 
     def getPointIdxListList(self):
