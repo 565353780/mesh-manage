@@ -219,6 +219,9 @@ def saveChannelMesh(channel_mesh, save_file_path, print_progress=False):
     o3d_mesh.compute_vertex_normals()
     o3d_mesh.compute_triangle_normals()
 
+    if print_progress:
+        print("[INFO][io::saveChannelMesh]")
+        print("\t start save mesh to", save_file_path, "...")
     o3d.io.write_triangle_mesh(
         save_file_path,
         o3d_mesh,
