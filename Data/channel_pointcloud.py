@@ -1,24 +1,51 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 from tqdm import tqdm
 from scipy.spatial.kdtree import KDTree
 
 from Data.channel_point import ChannelPoint
 
+from Method.io import loadFileData
+from Method.trans import transFormat
+
 class ChannelPointCloud(object):
-    def __init__(self):
+    def __init__(self, pointcloud_file_path=None, save_ignore_channel_name_list=[]):
+        self.save_ignore_channel_name_list = save_ignore_channel_name_list
+
         self.channel_point_list = []
         self.kd_tree = None
         self.xyz_changed = True
 
-        self.save_ignore_channel_name_list = ["r", "g", "b"]
+        if pointcloud_file_path is not None:
+            self.loadData(pointcloud_file_path)
         return
 
     def reset(self):
         self.channel_point_list.clear()
         self.kd_tree = None
         self.xyz_changed = True
+        return True
+
+    def loadData(self, pointcloud_file_path):
+        self.reset()
+
+        print("[INFO][ChannelPointCloud::loadData]")
+        print("\t start load pointcloud :")
+        print("\t pointcloud_file_path =", pointcloud_file_path)
+
+        channel_name_list, channel_value_list_list = loadFileData(pointcloud_file_path, True)
+
+        if channel_name_list == [] or channel_value_list_list == []:
+            print("[ERROR][ChannelPointCloud::loadData]")
+            print("\t loadFileData failed!")
+            return False
+
+        for channel_value_list in tqdm(channel_value_list_list):
+            self.addChannelPoint(channel_name_list, channel_value_list)
+
+        self.updateKDTree()
         return True
 
     def getChannelNameList(self):
@@ -326,8 +353,8 @@ class ChannelPointCloud(object):
         pcd_header += "DATA ascii\n"
         return pcd_header
 
-    def savePointCloud(self, save_pointcloud_file_path):
-        print("[INFO][ChannelPointCloud::savePointCloud]")
+    def savePCD(self, save_pointcloud_file_path):
+        print("[INFO][ChannelPointCloud::savePCD]")
         print("\t start save pointcloud to" + save_pointcloud_file_path + "...")
         with open(save_pointcloud_file_path, "w") as f:
             pcd_header = self.getPCDHeader()
@@ -344,6 +371,29 @@ class ChannelPointCloud(object):
                         f.write(" ")
                     else:
                         f.write("\n")
+        return True
+
+    def savePointCloud(self, save_pointcloud_file_path):
+        if save_pointcloud_file_path[:-4] == ".pcd":
+            if not self.savePCD(save_pointcloud_file_path):
+                print("[ERROR][ChannelPointCloud::savePointCloud]")
+                print("\t savePCD failed!")
+                return False
+        if save_pointcloud_file_path[:-4] == ".ply":
+            pcd_pointcloud_file_path = save_pointcloud_file_path[:-4] + ".pcd"
+            pcd_save_idx = 0
+            while os.path.exists(pcd_pointcloud_file_path):
+                pcd_pointcloud_file_path = save_pointcloud_file_path[:-4] + "_" + str(pcd_save_idx) + ".pcd"
+                pcd_save_idx += 1
+
+            if not self.savePCD(pcd_pointcloud_file_path):
+                print("[ERROR][ChannelPointCloud::savePointCloud]")
+                print("\t savePCD for ply file failed!")
+                return False
+            if not transFormat(pcd_pointcloud_file_path, save_pointcloud_file_path, True):
+                print("[ERROR][ChannelPointCloud::savePointCloud]")
+                print("\t transFormat failed!")
+                return False
         return True
 
     def outputInfo(self, info_level=0):
