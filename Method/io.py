@@ -184,7 +184,7 @@ def loadFileData(file_path, load_point_only=False):
         return [], []
     return [], [], []
 
-def saveChannelMesh(channel_mesh, save_file_path):
+def saveChannelMesh(channel_mesh, save_file_path, print_progress=False):
     if channel_mesh is None:
         print("[ERROR][io::saveChannelMesh]")
         print("\t channel_mesh is None!")
@@ -223,6 +223,6 @@ def saveChannelMesh(channel_mesh, save_file_path):
         save_file_path,
         o3d_mesh,
         write_ascii=True,
-        print_progress=True)
+        print_progress=print_progress)
     return True
 

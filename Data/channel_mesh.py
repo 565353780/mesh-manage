@@ -76,8 +76,8 @@ class ChannelMesh(object):
         channel_mesh = ChannelMesh(channel_pointcloud, face_set)
         return channel_mesh
 
-    def saveMesh(self, save_file_path):
-        if not saveChannelMesh(self, save_file_path):
+    def saveMesh(self, save_file_path, print_progress=False):
+        if not saveChannelMesh(self, save_file_path, print_progress):
             print("[ERROR][ChannelMesh::saveMesh]")
             print("\t saveChannelMesh failed!")
             return False
