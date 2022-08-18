@@ -9,6 +9,7 @@ from Data.channel_point import ChannelPoint
 
 from Method.io import loadFileData
 from Method.trans import transFormat
+from Method.pool import getChannelPointListWithPool
 
 class ChannelPointCloud(object):
     def __init__(self, pointcloud_file_path=None, save_ignore_channel_name_list=[]):
@@ -90,6 +91,24 @@ class ChannelPointCloud(object):
     def addChannelPoint(self, channel_name_list, channel_value_list):
         channel_point = ChannelPoint(channel_name_list, channel_value_list)
         self.channel_point_list.append(channel_point)
+        return True
+
+    def addChannelPointList(self, channel_name_list, channel_value_list_list, print_progress=False):
+        #  if print_progress:
+            #  for channel_value_list in tqdm(channel_value_list_list):
+                #  if not self.addChannelPoint(channel_name_list, channel_value_list):
+                    #  print("[ERROR][ChannelPointCloud::addChannelPointList]")
+                    #  print("\t addChannelPoint failed!")
+                    #  return False
+        #  else:
+            #  for channel_value_list in channel_value_list_list:
+                #  if not self.addChannelPoint(channel_name_list, channel_value_list):
+                    #  print("[ERROR][ChannelPointCloud::addChannelPointList]")
+                    #  print("\t addChannelPoint failed!")
+                    #  return False
+
+        channel_point_list = getChannelPointListWithPool(channel_name_list, channel_value_list_list)
+        self.channel_point_list.extend(channel_point_list)
         return True
 
     def getChannelPoint(self, channel_point_idx):

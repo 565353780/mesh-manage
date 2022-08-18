@@ -47,12 +47,7 @@ class ChannelMesh(ChannelPointCloud):
             print("\t loadFileData failed!")
             return False
 
-        if print_progress:
-            for channel_value_list in tqdm(channel_value_list_list):
-                self.addChannelPoint(channel_name_list, channel_value_list)
-        else:
-            for channel_value_list in channel_value_list_list:
-                self.addChannelPoint(channel_name_list, channel_value_list)
+        self.addChannelPointList(channel_name_list, channel_value_list_list, print_progress)
 
         self.updateKDTree()
 
