@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from Method.render import render
+from mesh_manage.Method.render import render
 
 # Param
 pointcloud_file_path = "./masked_pc/office/office_cut_painted.ply"
