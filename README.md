@@ -10,15 +10,8 @@ pip install open3d numpy tqdm scipy
 
 ## Run
 
-### Simple
 ```bash
-python auto_paint.py
-```
-
-### Step-By-Step
-```bash
-python merge.py
-python paint.py
+python demo.py
 ```
 
 ## Enjoy it~
