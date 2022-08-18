@@ -23,6 +23,7 @@ class ChannelPointCloud(object):
         return
 
     def reset(self):
+        print("start channel_pointcloud reset")
         self.channel_point_list.clear()
         self.kd_tree = None
         self.xyz_changed = True

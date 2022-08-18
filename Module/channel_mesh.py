@@ -9,28 +9,41 @@ from Method.io import loadFileData, saveChannelMesh
 
 from Module.channel_pointcloud import ChannelPointCloud
 
-class ChannelMesh(object):
-    def __init__(self, mesh_file_path=None, channel_pointcloud=ChannelPointCloud(), face_set=FaceSet()):
-        self.channel_pointcloud = channel_pointcloud
-        self.face_set = face_set
+class ChannelMesh(ChannelPointCloud):
+    def __init__(self, mesh_file_path=None, save_ignore_channel_name_list=[], load_point_only=False):
+        super(ChannelMesh, self).__init__()
+        self.save_ignore_channel_name_list = save_ignore_channel_name_list
+        self.face_set = FaceSet()
 
         if mesh_file_path is not None:
-            self.loadData(mesh_file_path)
+            self.loadData(mesh_file_path, load_point_only)
         return
 
+    @classmethod
+    def fromChannelPointCloud(cls, channel_pointcloud):
+        channel_mesh = cls(None, channel_pointcloud.save_ignore_channel_name_list, True)
+        channel_mesh.channel_point_list = channel_pointcloud.channel_point_list
+        channel_mesh.kd_tree = channel_pointcloud.kd_tree
+        channel_mesh.xyz_changed = channel_pointcloud.xyz_changed
+        return channel_mesh
+
     def reset(self):
-        self.channel_pointcloud.reset()
+        print("start channel_mesh reset")
+        super(ChannelMesh, self).reset()
+        print("finish channel_mesh reset")
         self.face_set.reset()
         return True
 
-    def loadData(self, mesh_file_path):
+    def loadData(self, mesh_file_path, load_point_only=False):
         self.reset()
 
         print("[INFO][ChannelMesh::loadData]")
         print("\t start load mesh :")
         print("\t mesh_file_path =", mesh_file_path)
 
-        channel_name_list, channel_value_list_list, point_idx_list_list = loadFileData(mesh_file_path)
+        channel_name_list, channel_value_list_list, point_idx_list_list = \
+            loadFileData(mesh_file_path, load_point_only)
+
         if channel_name_list == [] or channel_value_list_list == []:
             print("[ERROR][ChannelMesh::loadData]")
             print("\t loadFileData failed!")
@@ -45,15 +58,6 @@ class ChannelMesh(object):
             for point_idx_list in point_idx_list_list:
                 self.addFace(point_idx_list)
         return True
-
-    def addChannelPoint(self, channel_name_list, channel_value_list):
-        return self.channel_pointcloud.addChannelPoint(channel_name_list, channel_value_list)
-
-    def updateKDTree(self):
-        return self.channel_pointcloud.updateKDTree()
-
-    def getChannelPoint(self, channel_point_idx):
-        return self.channel_pointcloud.getChannelPoint(channel_point_idx)
 
     def addFace(self, point_idx_list):
         return self.face_set.addFace(point_idx_list)
@@ -74,7 +78,7 @@ class ChannelMesh(object):
             print("\t getPointIdxListAndMappingDict failed!")
             return None
 
-        channel_pointcloud = self.channel_pointcloud.getFilterChannelPointCloud(point_idx_list)
+        channel_pointcloud = self.getFilterChannelPointCloud(point_idx_list)
         if channel_pointcloud is None:
             print("[ERROR][ChannelMesh::getChannelMeshByFace]")
             print("\t getFilterChannelPointCloud failed!")
@@ -86,11 +90,12 @@ class ChannelMesh(object):
             print("\t getMappingFaceSet failed!")
             return None
 
-        channel_mesh = ChannelMesh(None, channel_pointcloud, face_set)
+        channel_mesh = ChannelMesh.fromChannelPointCloud(channel_pointcloud)
+        channel_mesh.face_set = face_set
         return channel_mesh
 
     def getChannelMeshByPoint(self, point_idx_list):
-        channel_pointcloud = self.channel_pointcloud.getFilterChannelPointCloud(point_idx_list)
+        channel_pointcloud = self.getFilterChannelPointCloud(point_idx_list)
         if channel_pointcloud is None:
             print("[ERROR][ChannelMesh::getChannelMeshByPoint]")
             print("\t getFilterChannelPointCloud failed!")
@@ -102,7 +107,8 @@ class ChannelMesh(object):
             print("\t getFaceSetInPointIdxList failed!")
             return None
 
-        channel_mesh = ChannelMesh(None, channel_pointcloud, face_set)
+        channel_mesh = ChannelMesh.fromChannelPointCloud(channel_pointcloud)
+        channel_mesh.face_set = face_set
         return channel_mesh
 
     def saveMesh(self, save_file_path, print_progress=False):
@@ -140,7 +146,7 @@ class ChannelMesh(object):
         line_start = "\t" * info_level
         print(line_start + "[ChannelMesh]")
         print(line_start + "\t channel_pointcloud =")
-        self.channel_pointcloud.outputInfo(info_level + 1)
+        super(ChannelMesh, self).outputInfo(info_level + 1)
         print(line_start + "\t face_set =")
         self.face_set.outputInfo(info_level + 1)
         return True
