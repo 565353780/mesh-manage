@@ -3,9 +3,9 @@
 
 import os
 
-from Config.color import d3_40_colors_rgb
+from mesh_manage.Config.color import d3_40_colors_rgb
 
-from Module.channel_mesh import ChannelMesh
+from mesh_manage.Module.channel_mesh import ChannelMesh
 
 class Painter(object):
     def __init__(self):

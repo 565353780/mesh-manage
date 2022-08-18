@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from Data.channel import Channel
+from mesh_manage.Data.channel import Channel
 
 class ChannelPoint(object):
     def __init__(self, channel_name_list=[], channel_value_list=[]):

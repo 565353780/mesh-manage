@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from time import time
 import os
 import numpy as np
 from multiprocessing import Pool
 
-from Data.channel_point import ChannelPoint
+from mesh_manage.Data.channel_point import ChannelPoint
 
 def isFaceInPointIdxList(inputs):
     face, point_idx_list = inputs

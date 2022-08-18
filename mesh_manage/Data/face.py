@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from Method.list import isListInList
+from mesh_manage.Method.list import isListInList
 
 class Face(object):
     def __init__(self, point_idx_list):

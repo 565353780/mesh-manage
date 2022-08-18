@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from tqdm import tqdm
+from mesh_manage.Data.face_set import FaceSet
 
-from Data.face_set import FaceSet
+from mesh_manage.Method.io import loadFileData, saveChannelMesh
 
-from Method.io import loadFileData, saveChannelMesh
-
-from Data.channel_pointcloud import ChannelPointCloud
+from mesh_manage.Data.channel_pointcloud import ChannelPointCloud
 
 class ChannelMesh(ChannelPointCloud):
     def __init__(self, mesh_file_path=None, save_ignore_channel_name_list=[], load_point_only=False):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from Method.sample import samplePointCloud, sampleMesh
+from mesh_manage.Method.sample import samplePointCloud, sampleMesh
 
 class Sampler(object):
     def __init__(self):

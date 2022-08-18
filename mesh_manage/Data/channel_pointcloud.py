@@ -5,11 +5,11 @@ import os
 from tqdm import tqdm
 from scipy.spatial.kdtree import KDTree
 
-from Data.channel_point import ChannelPoint
+from mesh_manage.Data.channel_point import ChannelPoint
 
-from Method.io import loadFileData
-from Method.trans import transFormat
-from Method.pool import getChannelPointListWithPool
+from mesh_manage.Method.io import loadFileData
+from mesh_manage.Method.trans import transFormat
+from mesh_manage.Method.pool import getChannelPointListWithPool
 
 class ChannelPointCloud(object):
     def __init__(self, pointcloud_file_path=None, save_ignore_channel_name_list=[]):

@@ -3,9 +3,9 @@
 
 from tqdm import tqdm
 
-from Data.face import Face
+from mesh_manage.Data.face import Face
 
-from Method.pool import getFaceIdxListInPointIdxListWithPool
+from mesh_manage.Method.pool import getFaceIdxListInPointIdxListWithPool
 
 class FaceSet(object):
     def __init__(self):

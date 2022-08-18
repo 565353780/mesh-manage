@@ -5,8 +5,8 @@ import os
 import numpy as np
 import open3d as o3d
 
-from Method.path import createFileFolder, getValidFilePath
-from Method.list import isListInList
+from mesh_manage.Method.path import createFileFolder, getValidFilePath
+from mesh_manage.Method.list import isListInList
 
 def loadPCD(pcd_file_path):
     '''

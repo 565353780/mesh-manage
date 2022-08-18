@@ -3,7 +3,7 @@
 
 import os
 
-from Method.trans import transFormat
+from mesh_manage.Method.trans import transFormat
 
 def getFileFolderPath(file_path):
     file_name = file_path.split("/")[-1]
