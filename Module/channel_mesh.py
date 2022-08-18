@@ -7,12 +7,11 @@ from Data.face_set import FaceSet
 
 from Method.io import loadFileData, saveChannelMesh
 
-from Module.channel_pointcloud import ChannelPointCloud
+from Data.channel_pointcloud import ChannelPointCloud
 
 class ChannelMesh(ChannelPointCloud):
     def __init__(self, mesh_file_path=None, save_ignore_channel_name_list=[], load_point_only=False):
-        super(ChannelMesh, self).__init__()
-        self.save_ignore_channel_name_list = save_ignore_channel_name_list
+        super(ChannelMesh, self).__init__(None, save_ignore_channel_name_list)
         self.face_set = FaceSet()
 
         if mesh_file_path is not None:
