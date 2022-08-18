@@ -8,5 +8,3 @@ __pycache__
 *.pcd
 *.ply
 
-# coc
-pyproject.toml
