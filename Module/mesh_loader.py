@@ -67,7 +67,7 @@ class MeshLoader(object):
         return True
 
 def demo():
-    mesh_file_path = "/home/chli/scan2cad/scannet/scans/scene0474_02/scene0474_02_vh_clean_2.ply"
+    mesh_file_path = "/home/chli/chLi/ScanNet/scans/scene0474_02/scene0474_02_vh_clean_2.ply"
 
     mesh_loader = MeshLoader(mesh_file_path)
 
