@@ -9,11 +9,17 @@ from Method.path import createFileFolder, getValidFilePath
 from Method.list import isListInList
 
 def loadPCD(pcd_file_path):
+    '''
+    Return:
+        channel_name_list
+        channel_value_list_list
+        point_idx_list_list
+    '''
     valid_file_path = getValidFilePath(pcd_file_path)
     if valid_file_path is None:
         print("[ERROR][io::loadPCD]")
         print("\t getValidFilePath failed!")
-        return [], []
+        return [], [], []
 
     channel_name_list = []
     point_num = -1
@@ -41,10 +47,10 @@ def loadPCD(pcd_file_path):
     if data_start_line_idx == -1:
         print("[ERROR][io::loadPCD]")
         print("\t data_start_line not found!")
-        return [], []
+        return [], [], []
 
     if point_num == -1:
-        return [], []
+        return [], [], []
 
     channel_value_list_list = []
 
@@ -58,15 +64,19 @@ def loadPCD(pcd_file_path):
 
         channel_value_list_list.append(channel_value_list)
 
-    return channel_name_list, channel_value_list_list
+    return channel_name_list, channel_value_list_list, []
 
 def loadPLY(ply_file_path, load_point_only):
+    '''
+    Return:
+        channel_name_list
+        channel_value_list_list
+        point_idx_list_list
+    '''
     valid_file_path = getValidFilePath(ply_file_path)
     if valid_file_path is None:
         print("[ERROR][io::loadPLY]")
         print("\t getValidFilePath failed!")
-        if load_point_only:
-            return [], []
         return [], [], []
 
     channel_name_list = []
@@ -103,13 +113,9 @@ def loadPLY(ply_file_path, load_point_only):
     if data_start_line_idx == -1:
         print("[ERROR][io::loadPLY]")
         print("\t data_start_line not found!")
-        if load_point_only:
-            return [], []
         return [], [], []
 
     if point_num == -1:
-        if load_point_only:
-            return [], []
         return [], [], []
 
     channel_value_list_list = []
@@ -125,7 +131,7 @@ def loadPLY(ply_file_path, load_point_only):
         channel_value_list_list.append(channel_value_list)
 
     if load_point_only:
-        return channel_name_list, channel_value_list_list
+        return channel_name_list, channel_value_list_list, []
 
     if face_num == -1:
         return channel_name_list, channel_value_list_list, []
@@ -144,10 +150,16 @@ def loadPLY(ply_file_path, load_point_only):
     return channel_name_list, channel_value_list_list, point_idx_list_list
 
 def loadOBJ(obj_file_path, load_point_only):
+    '''
+    Return:
+        channel_name_list
+        channel_value_list_list
+        point_idx_list_list
+    '''
     if not os.path.exists(obj_file_path):
         print("[ERROR][ChannelMesh::loadOBJFile]")
         print("\t obj_file not exist!")
-        return False
+        return [], [], []
 
     channel_name_list = [
         "x", "y", "z",
@@ -162,7 +174,7 @@ def loadOBJ(obj_file_path, load_point_only):
     channel_value_list_list = np.concatenate((points, colors), axis=1)
 
     if load_point_only:
-        return channel_name_list, channel_value_list_list
+        return channel_name_list, channel_value_list_list, []
 
     faces = np.asarray(o3d_mesh.triangles)
     point_idx_list_list = faces.tolist()
@@ -180,8 +192,6 @@ def loadFileData(file_path, load_point_only=False):
 
     print("[ERROR][io::loadFileData]")
     print("\t file format not valid!")
-    if load_point_only:
-        return [], []
     return [], [], []
 
 def saveChannelMesh(channel_mesh, save_file_path, print_progress=False):

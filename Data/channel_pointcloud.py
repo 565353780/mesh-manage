@@ -35,7 +35,7 @@ class ChannelPointCloud(object):
         print("\t start load pointcloud :")
         print("\t pointcloud_file_path =", pointcloud_file_path)
 
-        channel_name_list, channel_value_list_list = loadFileData(pointcloud_file_path, True)
+        channel_name_list, channel_value_list_list, _ = loadFileData(pointcloud_file_path, True)
 
         if channel_name_list == [] or channel_value_list_list == []:
             print("[ERROR][ChannelPointCloud::loadData]")
