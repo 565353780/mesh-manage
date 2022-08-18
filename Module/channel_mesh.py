@@ -28,9 +28,7 @@ class ChannelMesh(ChannelPointCloud):
         return channel_mesh
 
     def reset(self):
-        print("start channel_mesh reset")
         super(ChannelMesh, self).reset()
-        print("finish channel_mesh reset")
         self.face_set.reset()
         return True
 
