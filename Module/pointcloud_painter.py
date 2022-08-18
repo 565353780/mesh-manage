@@ -5,7 +5,7 @@ import os
 
 from Config.color import d3_40_colors_rgb
 
-from Data.channel_pointcloud import ChannelPointCloud
+from Module.channel_pointcloud import ChannelPointCloud
 
 class PointCloudPainter(object):
     def __init__(self):

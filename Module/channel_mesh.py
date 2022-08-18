@@ -3,10 +3,11 @@
 
 from tqdm import tqdm
 
-from Data.channel_pointcloud import ChannelPointCloud
 from Data.face_set import FaceSet
 
 from Method.io import loadFileData, saveChannelMesh
+
+from Module.channel_pointcloud import ChannelPointCloud
 
 class ChannelMesh(object):
     def __init__(self, mesh_file_path=None, channel_pointcloud=ChannelPointCloud(), face_set=FaceSet()):
@@ -143,4 +144,17 @@ class ChannelMesh(object):
         print(line_start + "\t face_set =")
         self.face_set.outputInfo(info_level + 1)
         return True
+
+def demo():
+    mesh_file_path = "/home/chli/chLi/ScanNet/scans/scene0474_02/scene0474_02_vh_clean_2.ply"
+
+    channel_mesh = ChannelMesh(mesh_file_path)
+
+    face_idx_list = [i for i in range(20)]
+
+    point_idx_list = channel_mesh.getPointIdxListFromFaceIdxList(face_idx_list)
+
+    channel_mesh.generateMeshByFace(face_idx_list, "/home/chli/chLi/channel_mesh/test1.ply")
+    channel_mesh.generateMeshByPoint(point_idx_list, "/home/chli/chLi/channel_mesh/test2.ply")
+    return True
 

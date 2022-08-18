@@ -405,3 +405,12 @@ class ChannelPointCloud(object):
             self.channel_point_list[0].outputInfo(info_level + 1)
         return True
 
+def demo():
+    pointcloud_file_path = \
+        "/home/chli/chLi/OBJs/OpenGL/bunny_1.ply"
+
+    channel_pointcloud = ChannelPointCloud()
+    channel_pointcloud.loadData(pointcloud_file_path)
+    channel_pointcloud.outputInfo()
+    return True
+
