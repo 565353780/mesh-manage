@@ -31,12 +31,13 @@ class ChannelMesh(ChannelPointCloud):
         self.face_set.reset()
         return True
 
-    def loadData(self, mesh_file_path, load_point_only=False):
+    def loadData(self, mesh_file_path, load_point_only=False, print_progress=False):
         self.reset()
 
-        print("[INFO][ChannelMesh::loadData]")
-        print("\t start load mesh :")
-        print("\t mesh_file_path =", mesh_file_path)
+        if print_progress:
+            print("[INFO][ChannelMesh::loadData]")
+            print("\t start load mesh :")
+            print("\t mesh_file_path =", mesh_file_path)
 
         channel_name_list, channel_value_list_list, point_idx_list_list = \
             loadFileData(mesh_file_path, load_point_only)
@@ -46,8 +47,12 @@ class ChannelMesh(ChannelPointCloud):
             print("\t loadFileData failed!")
             return False
 
-        for channel_value_list in tqdm(channel_value_list_list):
-            self.addChannelPoint(channel_name_list, channel_value_list)
+        if print_progress:
+            for channel_value_list in tqdm(channel_value_list_list):
+                self.addChannelPoint(channel_name_list, channel_value_list)
+        else:
+            for channel_value_list in channel_value_list_list:
+                self.addChannelPoint(channel_name_list, channel_value_list)
 
         self.updateKDTree()
 
