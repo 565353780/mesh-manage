@@ -57,6 +57,9 @@ class ChannelMesh(ChannelPointCloud):
     def addFace(self, point_idx_list):
         return self.face_set.addFace(point_idx_list)
 
+    def addFaceSet(self, face_set, point_start_idx):
+        return self.face_set.addFaceSet(face_set, point_start_idx)
+
     def getFace(self, face_idx):
         return self.face_set.getFace(face_idx)
 
