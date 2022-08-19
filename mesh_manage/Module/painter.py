@@ -31,7 +31,7 @@ class Painter(object):
             print("\t mesh_name already exist!")
             return False
 
-        channel_mesh = ChannelMesh(mesh_file_path, [], True)
+        channel_mesh = ChannelMesh(mesh_file_path)
         self.channel_mesh_dict[mesh_name] = channel_mesh
         return True
 
@@ -129,6 +129,8 @@ class Painter(object):
             print("\t channel_mesh_dict is empty!")
             return True
 
+        point_start_idx = 0
+
         if print_progress:
             for _, channel_mesh in tqdm(self.channel_mesh_dict.items()):
                 color = [randint(0, 255), randint(0, 255), randint(0, 255)]
@@ -140,6 +142,8 @@ class Painter(object):
                     channel_value_list.extend(color)
 
                 self.merge_channel_mesh.addChannelPointList(channel_name_list, channel_value_list_list)
+                self.merge_channel_mesh.addFaceSet(channel_mesh.face_set, point_start_idx)
+                point_start_idx += len(channel_mesh.channel_point_list)
         else:
             for _, channel_mesh in self.channel_mesh_dict.items():
                 color = [randint(0, 255), randint(0, 255), randint(0, 255)]
@@ -151,6 +155,8 @@ class Painter(object):
                     channel_value_list.extend(color)
 
                 self.merge_channel_mesh.addChannelPointList(channel_name_list, channel_value_list_list)
+                self.merge_channel_mesh.addFaceSet(channel_mesh.face_set, point_start_idx)
+                point_start_idx += len(channel_mesh.channel_point_list)
         return True
 
     def savePaintedPointCloud(self, save_file_path, print_progress=False):
@@ -228,7 +234,7 @@ def demo_auto_paint():
 
 def demo_merge_with_color():
     mesh_folder_path = "/home/chli/chLi/ScanNet/objects/scene0000_00/"
-    save_file_path = "/home/chli/chLi/test_merge.obj"
+    save_file_path = "/home/chli/chLi/test_merge.ply"
 
     painter = Painter()
     painter.loadMeshFolder(mesh_folder_path, True)
