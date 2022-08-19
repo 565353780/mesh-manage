@@ -43,6 +43,14 @@ class FaceSet(object):
         self.face_list.append(face)
         return True
 
+    def addFaceSet(self, face_set, point_start_idx):
+        for face in face_set.face_list:
+            point_idx_list = face.point_idx_list
+            mapping_point_idx_list = [point_idx + point_start_idx for point_idx in point_idx_list]
+            mapping_face = Face(mapping_point_idx_list)
+            self.face_list.append(mapping_face)
+        return True
+
     def getFace(self, face_idx):
         if face_idx >= len(self.face_list):
             print("[ERROR][FaceSet::getFace]")
