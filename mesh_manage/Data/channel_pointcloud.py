@@ -94,6 +94,20 @@ class ChannelPointCloud(object):
         return True
 
     def addChannelPointList(self, channel_name_list, channel_value_list_list, print_progress=False):
+        if len(channel_name_list) == 0:
+            print("[WARN][ChannelPointCloud::addChannelPointList]")
+            print("\t channel_name_list is empty!")
+            return True
+
+        if len(channel_value_list_list) == 0:
+            print("[WARN][ChannelPointCloud::addChannelPointList]")
+            print("\t channel_value_list_list is empty!")
+            return True
+
+        if print_progress:
+            print("[INFO][ChannelPointCloud::addChannelPointList]")
+            print("\t start add channel point list...")
+
         #  if print_progress:
             #  for channel_value_list in tqdm(channel_value_list_list):
                 #  if not self.addChannelPoint(channel_name_list, channel_value_list):
