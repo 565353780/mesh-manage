@@ -4,9 +4,14 @@
 import numpy as np
 import open3d as o3d
 
-from mesh_manage.Config.color import red_white_color_map, red_blue_color_map
+from mesh_manage.Config.color import \
+    red_white_color_map, \
+    red_blue_color_map, \
+    red_gray_color_map
 
 COLOR_MAP = red_white_color_map
+COLOR_MAP = red_blue_color_map
+COLOR_MAP = red_gray_color_map
 
 def getSpherePointCloud(pointcloud,radius=1.0, resolution=20):
     sphere_pointcloud = o3d.geometry.PointCloud()
