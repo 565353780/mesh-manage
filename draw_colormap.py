@@ -55,12 +55,11 @@ def Open3DVisualizer(geometry_list):
     visualizer.destroy_window()
     return True
 
-def getHeatMap():
-    partial_mesh_file_path = \
-        "/home/chli/.gazebo/models/MatterPort/03/matterport_03_bed_dong.ply"
-    complete_mesh_file_path = \
-        "/home/chli/.gazebo/models/MatterPort/03/matterport_03_bed_source.ply"
-
+def getHeatMap(partial_mesh_file_path,
+               complete_mesh_file_path,
+               save_partial_mesh_file_path,
+               save_complete_mesh_file_path,
+               is_visual=False):
     complete_mesh = o3d.io.read_triangle_mesh(complete_mesh_file_path)
     complete_pointcloud = o3d.io.read_point_cloud(complete_mesh_file_path)
 
@@ -118,20 +117,27 @@ def getHeatMap():
 
     #  sphere_complete_pointcloud = getSpherePointCloud(complete_pointcloud, 0.001, 20)
 
-    o3d.visualization.draw_geometries([
-        partial_mesh,
-        complete_pointcloud
-    ])
+    if is_visual:
+        o3d.visualization.draw_geometries([partial_mesh, complete_pointcloud])
 
-    partial_mesh_path = "/home/chli/chLi/mp3d03_bed_part.ply"
-    complete_mesh_path = "/home/chli/chLi/mp3d03_bed_comp.ply"
-    o3d.io.write_triangle_mesh(partial_mesh_path, partial_mesh, write_ascii=True)
-    o3d.io.write_triangle_mesh(complete_mesh_path, complete_mesh, write_ascii=True)
-
+    o3d.io.write_triangle_mesh(save_partial_mesh_file_path, partial_mesh, write_ascii=True)
+    o3d.io.write_triangle_mesh(save_complete_mesh_file_path, complete_mesh, write_ascii=True)
     return True
 
 def demo():
-    getHeatMap()
+    partial_mesh_file_path = \
+        "/home/chli/.ros/RUN_LOG/PointCloud2ToObjectVecConverterServer/2022_9_4_19-32-7_coscan/scene_19.ply"
+    complete_mesh_file_path = \
+        "/home/chli/.gazebo/models/MatterPort/03/matterport_03.ply"
+    save_partial_mesh_file_path = \
+        "/home/chli/chLi/mp3d03_part_coscan.ply"
+    save_complete_mesh_file_path = \
+        "/home/chli/chLi/mp3d03_comp_coscan.ply"
+
+    getHeatMap(partial_mesh_file_path,
+               complete_mesh_file_path,
+               save_partial_mesh_file_path,
+               save_complete_mesh_file_path)
     return True
 
 if __name__ == "__main__":
