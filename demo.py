@@ -7,5 +7,6 @@ from mesh_manage.Module.channel_mesh import demo as demo_generate_mesh
 
 if __name__ == "__main__":
     #  demo_generate_mesh()
-    demo_merge_with_color()
+    #  demo_merge_with_color()
+    demo_sample_mesh()
 
