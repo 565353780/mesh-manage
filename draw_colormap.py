@@ -4,7 +4,7 @@
 import numpy as np
 import open3d as o3d
 
-from Config.color import red_white_color_map, red_blue_color_map
+from mesh_manage.Config.color import red_white_color_map, red_blue_color_map
 
 COLOR_MAP = red_white_color_map
 
@@ -52,9 +52,9 @@ def Open3DVisualizer(geometry_list):
 
 def getHeatMap():
     partial_mesh_file_path = \
-        "/home/chli/chLi/coscan_data/incomplete_chair_1.ply"
+        "/home/chli/.gazebo/models/MatterPort/03/matterport_03_bed_dong.ply"
     complete_mesh_file_path = \
-        "/home/chli/chLi/coscan_data/chari-complete_4.ply"
+        "/home/chli/.gazebo/models/MatterPort/03/matterport_03_bed_source.ply"
 
     complete_mesh = o3d.io.read_triangle_mesh(complete_mesh_file_path)
     complete_pointcloud = o3d.io.read_point_cloud(complete_mesh_file_path)
@@ -118,8 +118,8 @@ def getHeatMap():
         complete_pointcloud
     ])
 
-    partial_mesh_path = "/home/chli/chLi/coscan_data/chair_partial_mesh.ply"
-    complete_mesh_path = "/home/chli/chLi/coscan_data/chair_complete_mesh.ply"
+    partial_mesh_path = "/home/chli/chLi/mp3d03_bed_part.ply"
+    complete_mesh_path = "/home/chli/chLi/mp3d03_bed_comp.ply"
     o3d.io.write_triangle_mesh(partial_mesh_path, partial_mesh, write_ascii=True)
     o3d.io.write_triangle_mesh(complete_mesh_path, complete_mesh, write_ascii=True)
 
