@@ -5,10 +5,12 @@ from mesh_manage.Method.trans import transFormat
 
 # Param
 source_pointcloud_file_path = \
-    "/home/chli/chLi/OBJs/OpenGL/bunny_1.ply"
+    "/home/chli/.ros/RUN_LOG/PointCloud2ToObjectVecConverterServer/2022_9_4_19-32-7_coscan/scene_19.pcd"
 target_pointcloud_file_path = \
-    "/home/chli/chLi/OBJs/OpenGL/bunny_2.ply"
+    "/home/chli/.ros/RUN_LOG/PointCloud2ToObjectVecConverterServer/2022_9_4_19-32-7_coscan/scene_19.ply"
 
 # Process
-transFormat(source_pointcloud_file_path, target_pointcloud_file_path)
+transFormat(source_pointcloud_file_path,
+            target_pointcloud_file_path,
+            True)
 
