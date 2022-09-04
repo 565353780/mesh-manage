@@ -42,14 +42,14 @@ def demo_sample_pointcloud():
 
     sampler = Sampler()
     sampler.samplePointCloud(pointcloud_file_path,
-                                        down_sample_cluster_num,
-                                        save_pointcloud_file_path)
+                             down_sample_cluster_num,
+                             save_pointcloud_file_path)
     return True
 
 def demo_sample_mesh():
-    mesh_file_path = "/home/chli/chLi/OBJs/OpenGL/bunny_1.obj"
-    vertex_cluster_dist_max = 0.01
-    save_mesh_file_path = "/home/chli/chLi/OBJs/OpenGL/bunny_1_sampled.obj"
+    mesh_file_path = "/home/chli/.gazebo/models/MatterPort/03/matterport_03_bed_source.ply"
+    vertex_cluster_dist_max = 0.0001
+    save_mesh_file_path = "/home/chli/.gazebo/models/MatterPort/03/matterport_03_bed_source_0001.ply"
 
     mesh_sampler = Sampler()
     mesh_sampler.sampleMesh(mesh_file_path,
