@@ -80,7 +80,7 @@ def getHeatMap(partial_mesh_file_path,
         partial_mesh.vertices = o3d.utility.Vector3dVector(partial_points)
 
     partial_colors = np.array([[101, 91, 82] for _ in np.array(partial_mesh.vertices)],
-                              dtype=np.float)/255.0
+                              dtype=float)/255.0
     partial_pointcloud.colors = o3d.utility.Vector3dVector(partial_colors)
     partial_mesh.vertex_colors = o3d.utility.Vector3dVector(partial_colors)
 
@@ -106,7 +106,7 @@ def getHeatMap(partial_mesh_file_path,
             color += next_color_weight * COLOR_MAP[color_idx + 1]
         colors.append(color)
 
-    colors = np.array(colors, dtype=np.float) / 255.0
+    colors = np.array(colors, dtype=float) / 255.0
     complete_pointcloud.colors = o3d.utility.Vector3dVector(colors)
     complete_mesh.vertex_colors = o3d.utility.Vector3dVector(colors)
 
