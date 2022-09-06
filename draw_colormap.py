@@ -58,6 +58,7 @@ def getHeatMap(partial_mesh_file_path,
                save_complete_mesh_file_path,
                mesh_move_list=None,
                partial_noise_sigma=0,
+               error_max=None,
                is_visual=False):
     complete_mesh = o3d.io.read_triangle_mesh(complete_mesh_file_path)
     complete_pointcloud = o3d.io.read_point_cloud(complete_mesh_file_path)
@@ -96,7 +97,9 @@ def getHeatMap(partial_mesh_file_path,
     colors = []
     color_num = len(color_map)
     min_dist = 0
-    max_dist = np.max(dist_to_partial)
+    max_dist = error_max
+    if max_dist is None:
+        max_dist = np.max(dist_to_partial)
     dist_step = (max_dist - min_dist) / (color_num - 1.0)
 
     for dist in dist_to_partial:
@@ -140,12 +143,14 @@ def demo():
     save_complete_mesh_file_path = \
         "/home/chli/chLi/coscan_data/scene_result/matterport3d_03/comp_coscan.ply"
     mesh_move_list = MESH_MOVE_DICT["matterport3d_03"]
+    error_max = 1.0
 
     getHeatMap(partial_mesh_file_path,
                complete_mesh_file_path,
                save_partial_mesh_file_path,
                save_complete_mesh_file_path,
-               mesh_move_list)
+               mesh_move_list,
+               error_max=error_max)
     return True
 
 if __name__ == "__main__":
