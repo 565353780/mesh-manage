@@ -10,6 +10,8 @@ from mesh_manage.Config.color import \
     red_gray_color_map, \
     sand_bole_color_map
 
+from mesh_manage.Config.move import MESH_MOVE_DICT
+
 COLOR_MAP = sand_bole_color_map
 
 def getSpherePointCloud(pointcloud,radius=1.0, resolution=20):
@@ -141,7 +143,7 @@ def demo():
         "/home/chli/chLi/coscan_data/scene_result/front3d19/part_coscan.ply"
     save_complete_mesh_file_path = \
         "/home/chli/chLi/coscan_data/scene_result/front3d19/comp_coscan.ply"
-    mesh_move_list = [2.32954, -3.56801, 0.0]
+    mesh_move_list = MESH_MOVE_DICT["front3d_19"]
 
     getHeatMap(partial_mesh_file_path,
                complete_mesh_file_path,
