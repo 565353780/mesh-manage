@@ -6,8 +6,6 @@ import open3d as o3d
 
 from mesh_manage.Config.color import COLOR_MAP_DICT
 
-from mesh_manage.Config.move import MESH_MOVE_DICT
-
 color_map = COLOR_MAP_DICT["jet"]
 
 def getSpherePointCloud(pointcloud,radius=1.0, resolution=20):
@@ -56,7 +54,6 @@ def getHeatMap(partial_mesh_file_path,
                complete_mesh_file_path,
                save_partial_mesh_file_path,
                save_complete_mesh_file_path,
-               mesh_move_list=None,
                partial_noise_sigma=0,
                error_max=None,
                is_visual=False):
@@ -66,12 +63,18 @@ def getHeatMap(partial_mesh_file_path,
     partial_mesh = o3d.io.read_triangle_mesh(partial_mesh_file_path)
     partial_pointcloud = o3d.io.read_point_cloud(partial_mesh_file_path)
 
-    if mesh_move_list is not None:
-        partial_points = np.array(partial_pointcloud.points)
-        move_array = np.array(mesh_move_list)
-        partial_points += move_array
-        partial_pointcloud.points = o3d.utility.Vector3dVector(partial_points)
-        partial_mesh.vertices = o3d.utility.Vector3dVector(partial_points)
+    threshold = 1.0
+    trans_init = np.asarray([[1,0,0,0],
+                             [0,1,0,0],
+                             [0,0,1,0],
+                             [0,0,0,1]])
+
+    reg_p2p = o3d.pipelines.registration.registration_icp(
+        partial_pointcloud, complete_pointcloud, threshold, trans_init,
+        o3d.pipelines.registration.TransformationEstimationPointToPoint())
+
+    partial_pointcloud.transform(reg_p2p.transformation)
+    partial_mesh.transform(reg_p2p.transformation)
 
     if partial_noise_sigma > 0:
         partial_points = np.array(partial_pointcloud.points)
@@ -142,17 +145,52 @@ def demo():
         "/home/chli/chLi/coscan_data/scene_result/matterport3d_03/part_coscan.ply"
     save_complete_mesh_file_path = \
         "/home/chli/chLi/coscan_data/scene_result/matterport3d_03/comp_coscan.ply"
-    mesh_move_list = MESH_MOVE_DICT["matterport3d_03"]
-    error_max = 1.0
+    error_max = 0.3
 
     getHeatMap(partial_mesh_file_path,
                complete_mesh_file_path,
                save_partial_mesh_file_path,
                save_complete_mesh_file_path,
-               mesh_move_list,
+               error_max=error_max)
+    return True
+
+def demo_coscan():
+    coscan_partial_mesh_file_path = \
+        "/home/chli/chLi/coscan_data/scene_result/matterport3d_03/coscan/scene_19.ply"
+    dong_partial_mesh_file_path = \
+        "/home/chli/chLi/coscan_data/scene_result/matterport3d_03/dong/scene_21.ply"
+
+    complete_mesh_file_path = \
+        "/home/chli/chLi/coscan_data/scene_result/matterport3d_03/matterport_03_cut.ply"
+
+    coscan_save_partial_mesh_file_path = \
+        "/home/chli/chLi/coscan_data/scene_result/matterport3d_03/part_coscan.ply"
+    dong_save_partial_mesh_file_path = \
+        "/home/chli/chLi/coscan_data/scene_result/matterport3d_03/part_dong.ply"
+
+    coscan_save_complete_mesh_file_path = \
+        "/home/chli/chLi/coscan_data/scene_result/matterport3d_03/comp_coscan.ply"
+    dong_save_complete_mesh_file_path = \
+        "/home/chli/chLi/coscan_data/scene_result/matterport3d_03/comp_dong.ply"
+
+    error_max = 0.5
+
+    print("start get coscan heatmap...")
+    getHeatMap(coscan_partial_mesh_file_path,
+               complete_mesh_file_path,
+               coscan_save_partial_mesh_file_path,
+               coscan_save_complete_mesh_file_path,
+               error_max=error_max)
+
+    print("start get dong heatmap...")
+    getHeatMap(dong_partial_mesh_file_path,
+               complete_mesh_file_path,
+               dong_save_partial_mesh_file_path,
+               dong_save_complete_mesh_file_path,
                error_max=error_max)
     return True
 
 if __name__ == "__main__":
-    demo()
+    #  demo()
+    demo_coscan()
 
