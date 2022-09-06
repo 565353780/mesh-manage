@@ -7,11 +7,10 @@ import open3d as o3d
 from mesh_manage.Config.color import \
     red_white_color_map, \
     red_blue_color_map, \
-    red_gray_color_map
+    red_gray_color_map, \
+    sand_bole_color_map
 
-COLOR_MAP = red_white_color_map
-COLOR_MAP = red_blue_color_map
-COLOR_MAP = red_gray_color_map
+COLOR_MAP = sand_bole_color_map
 
 def getSpherePointCloud(pointcloud,radius=1.0, resolution=20):
     sphere_pointcloud = o3d.geometry.PointCloud()
@@ -59,18 +58,27 @@ def getHeatMap(partial_mesh_file_path,
                complete_mesh_file_path,
                save_partial_mesh_file_path,
                save_complete_mesh_file_path,
+               mesh_move_list=None,
+               partial_noise_sigma = 0
                is_visual=False):
     complete_mesh = o3d.io.read_triangle_mesh(complete_mesh_file_path)
     complete_pointcloud = o3d.io.read_point_cloud(complete_mesh_file_path)
 
     partial_mesh = o3d.io.read_triangle_mesh(partial_mesh_file_path)
     partial_pointcloud = o3d.io.read_point_cloud(partial_mesh_file_path)
-    sigma = 0
-    if sigma > 0:
+
+    if mesh_move_list is not None:
         partial_points = np.array(partial_pointcloud.points)
-        noise_x = np.random.normal(0, sigma, partial_points.shape[0])
-        noise_y = np.random.normal(0, sigma, partial_points.shape[0])
-        noise_z = np.random.normal(0, sigma, partial_points.shape[0])
+        move_array = np.array(mesh_move_list)
+        partial_points += move_array
+        partial_pointcloud.points = o3d.utility.Vector3dVector(partial_points)
+        partial_mesh.vertices = o3d.utility.Vector3dVector(partial_points)
+
+    if partial_noise_sigma > 0:
+        partial_points = np.array(partial_pointcloud.points)
+        noise_x = np.random.normal(0, partial_noise_sigma, partial_points.shape[0])
+        noise_y = np.random.normal(0, partial_noise_sigma, partial_points.shape[0])
+        noise_z = np.random.normal(0, partial_noise_sigma, partial_points.shape[0])
         noise = []
         for i in range(partial_points.shape[0]):
             noise.append([noise_x[i], noise_y[i], noise_z[i]])
@@ -126,18 +134,20 @@ def getHeatMap(partial_mesh_file_path,
 
 def demo():
     partial_mesh_file_path = \
-        "/home/chli/.ros/RUN_LOG/PointCloud2ToObjectVecConverterServer/2022_9_4_19-32-7_coscan/scene_19.ply"
+        "/home/chli/chLi/coscan_data/scene_result/front3d19/coscan/scene_29.ply"
     complete_mesh_file_path = \
-        "/home/chli/.gazebo/models/MatterPort/03/matterport_03.ply"
+        "/home/chli/chLi/coscan_data/scene_result/front3d19/19.ply"
     save_partial_mesh_file_path = \
-        "/home/chli/chLi/mp3d03_part_coscan.ply"
+        "/home/chli/chLi/coscan_data/scene_result/front3d19/part_coscan.ply"
     save_complete_mesh_file_path = \
-        "/home/chli/chLi/mp3d03_comp_coscan.ply"
+        "/home/chli/chLi/coscan_data/scene_result/front3d19/comp_coscan.ply"
+    mesh_move_list = [2.32954, -3.56801, 0.0]
 
     getHeatMap(partial_mesh_file_path,
                complete_mesh_file_path,
                save_partial_mesh_file_path,
-               save_complete_mesh_file_path)
+               save_complete_mesh_file_path,
+               mesh_move_list)
     return True
 
 if __name__ == "__main__":
