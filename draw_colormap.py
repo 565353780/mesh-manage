@@ -4,15 +4,11 @@
 import numpy as np
 import open3d as o3d
 
-from mesh_manage.Config.color import \
-    red_white_color_map, \
-    red_blue_color_map, \
-    red_gray_color_map, \
-    sand_bole_color_map
+from mesh_manage.Config.color import COLOR_MAP_DICT
 
 from mesh_manage.Config.move import MESH_MOVE_DICT
 
-COLOR_MAP = sand_bole_color_map
+color_map = COLOR_MAP_DICT["jet"]
 
 def getSpherePointCloud(pointcloud,radius=1.0, resolution=20):
     sphere_pointcloud = o3d.geometry.PointCloud()
@@ -61,7 +57,7 @@ def getHeatMap(partial_mesh_file_path,
                save_partial_mesh_file_path,
                save_complete_mesh_file_path,
                mesh_move_list=None,
-               partial_noise_sigma = 0
+               partial_noise_sigma=0,
                is_visual=False):
     complete_mesh = o3d.io.read_triangle_mesh(complete_mesh_file_path)
     complete_pointcloud = o3d.io.read_point_cloud(complete_mesh_file_path)
@@ -98,7 +94,7 @@ def getHeatMap(partial_mesh_file_path,
         partial_pointcloud)
 
     colors = []
-    color_num = len(COLOR_MAP)
+    color_num = len(color_map)
     min_dist = 0
     max_dist = np.max(dist_to_partial)
     dist_step = (max_dist - min_dist) / (color_num - 1.0)
@@ -107,13 +103,13 @@ def getHeatMap(partial_mesh_file_path,
         dist_divide = dist / dist_step
         color_idx = int(dist_divide)
         if color_idx >= color_num - 1:
-            colors.append(COLOR_MAP[color_num - 1])
+            colors.append(color_map[color_num - 1])
             continue
 
         next_color_weight = dist_divide - color_idx
-        color = (1.0 - next_color_weight) * COLOR_MAP[color_idx]
+        color = (1.0 - next_color_weight) * color_map[color_idx]
         if next_color_weight > 0:
-            color += next_color_weight * COLOR_MAP[color_idx + 1]
+            color += next_color_weight * color_map[color_idx + 1]
         colors.append(color)
 
     colors = np.array(colors, dtype=float) / 255.0
@@ -136,14 +132,14 @@ def getHeatMap(partial_mesh_file_path,
 
 def demo():
     partial_mesh_file_path = \
-        "/home/chli/chLi/coscan_data/scene_result/front3d19/coscan/scene_29.ply"
+        "/home/chli/chLi/coscan_data/scene_result/matterport3d_03/coscan/scene_19.ply"
     complete_mesh_file_path = \
-        "/home/chli/chLi/coscan_data/scene_result/front3d19/19.ply"
+        "/home/chli/chLi/coscan_data/scene_result/matterport3d_03/matterport_03_cut.ply"
     save_partial_mesh_file_path = \
-        "/home/chli/chLi/coscan_data/scene_result/front3d19/part_coscan.ply"
+        "/home/chli/chLi/coscan_data/scene_result/matterport3d_03/part_coscan.ply"
     save_complete_mesh_file_path = \
-        "/home/chli/chLi/coscan_data/scene_result/front3d19/comp_coscan.ply"
-    mesh_move_list = MESH_MOVE_DICT["front3d_19"]
+        "/home/chli/chLi/coscan_data/scene_result/matterport3d_03/comp_coscan.ply"
+    mesh_move_list = MESH_MOVE_DICT["matterport3d_03"]
 
     getHeatMap(partial_mesh_file_path,
                complete_mesh_file_path,
