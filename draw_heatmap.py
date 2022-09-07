@@ -46,16 +46,33 @@ def demo_coscan():
             "complete_mesh_file_path":scene_result_folder_path +
                 "front3d_19/19_cut.ply",
         },
+        "matterport3d_01": {
+            "coscan_partial_mesh_file_path": scene_result_folder_path +
+                "matterport3d_01/coscan/scene_29.ply",
+            "dong_partial_mesh_file_path": scene_result_folder_path +
+                "matterport3d_01/dong/scene_24.ply",
+            "complete_mesh_file_path":scene_result_folder_path +
+                "matterport3d_01/matterport_01_cut.ply",
+        },
         "matterport3d_03": {
             "coscan_partial_mesh_file_path": scene_result_folder_path +
-                "matterport3d_03/coscan/scene_29.ply",
+                "matterport3d_03/coscan/scene_19.ply",
             "dong_partial_mesh_file_path": scene_result_folder_path +
-                "matterport3d_03/dong/scene_27.ply",
+                "matterport3d_03/dong/scene_21.ply",
             "complete_mesh_file_path":scene_result_folder_path +
-                "matterport3d_03/19_cut.ply",
+                "matterport3d_03/matterport_03_cut.ply",
+        },
+        "matterport3d_05": {
+            "coscan_partial_mesh_file_path": scene_result_folder_path +
+                "matterport3d_05/coscan/scene_33.ply",
+            "dong_partial_mesh_file_path": scene_result_folder_path +
+                "matterport3d_05/dong/scene_21.ply",
+            "complete_mesh_file_path":scene_result_folder_path +
+                "matterport3d_05/matterport_05_cut.ply",
         },
     }
 
+    # Auto generate, no need to edit
     work_dict = work_dict_collection[scene_name]
     coscan_partial_mesh_file_path = work_dict["coscan_partial_mesh_file_path"]
     dong_partial_mesh_file_path = work_dict["dong_partial_mesh_file_path"]
