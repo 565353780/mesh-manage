@@ -32,28 +32,38 @@ def demo():
 def demo_coscan():
     scene_result_folder_path = "/home/chli/chLi/coscan_data/scene_result/"
     scene_name = "front3d_19"
-    gt_mesh_file_name = "19_cut.ply"
-    coscan_result_file_name = "scene_29.ply"
-    dong_result_file_name = "scene_27.ply"
-    move_list = MOVE_LIST_DICT["front3d_19"]
-
+    move_list = MOVE_LIST_DICT[scene_name]
     error_max = 0.5
     is_visual = False
     print_progress = True
 
-    coscan_partial_mesh_file_path = scene_result_folder_path + \
-        scene_name + "/coscan/" + coscan_result_file_name
-    dong_partial_mesh_file_path = scene_result_folder_path + \
-        scene_name + "/dong/" + dong_result_file_name
+    work_dict_collection = {
+        "front3d_19": {
+            "coscan_partial_mesh_file_path": scene_result_folder_path +
+                "front3d_19/coscan/scene_29.ply",
+            "dong_partial_mesh_file_path": scene_result_folder_path +
+                "front3d_19/dong/scene_27.ply",
+            "complete_mesh_file_path":scene_result_folder_path +
+                "front3d_19/19_cut.ply",
+        },
+        "matterport3d_03": {
+            "coscan_partial_mesh_file_path": scene_result_folder_path +
+                "matterport3d_03/coscan/scene_29.ply",
+            "dong_partial_mesh_file_path": scene_result_folder_path +
+                "matterport3d_03/dong/scene_27.ply",
+            "complete_mesh_file_path":scene_result_folder_path +
+                "matterport3d_03/19_cut.ply",
+        },
+    }
 
-    complete_mesh_file_path = scene_result_folder_path + \
-        scene_name + "/" + gt_mesh_file_name
-
+    work_dict = work_dict_collection[scene_name]
+    coscan_partial_mesh_file_path = work_dict["coscan_partial_mesh_file_path"]
+    dong_partial_mesh_file_path = work_dict["dong_partial_mesh_file_path"]
+    complete_mesh_file_path = work_dict["complete_mesh_file_path"]
     coscan_save_partial_mesh_file_path = scene_result_folder_path + \
         scene_name + "/part_coscan.ply"
     dong_save_partial_mesh_file_path = scene_result_folder_path + \
         scene_name + "/part_dong.ply"
-
     coscan_save_complete_mesh_file_path = scene_result_folder_path + \
         scene_name + "/comp_coscan.ply"
     dong_save_complete_mesh_file_path = scene_result_folder_path + \
