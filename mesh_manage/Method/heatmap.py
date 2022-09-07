@@ -44,6 +44,7 @@ def getHeatMap(partial_mesh_file_path,
                save_partial_mesh_file_path,
                save_complete_mesh_file_path,
                color_map=COLOR_MAP_DICT["jet"],
+               move_list=None,
                partial_noise_sigma=0,
                error_max=None,
                is_visual=False,
@@ -64,7 +65,10 @@ def getHeatMap(partial_mesh_file_path,
     trans_init = np.asarray([[1,0,0,0],
                              [0,1,0,0],
                              [0,0,1,0],
-                             [0,0,0,1]])
+                             [0,0,0,1]], dtype=float)
+
+    if move_list is not None:
+        trans_init[:3, 3] = move_list
 
     reg_p2p = o3d.pipelines.registration.registration_icp(
         partial_pointcloud, complete_pointcloud, threshold, trans_init,
