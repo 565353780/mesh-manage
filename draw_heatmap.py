@@ -37,8 +37,7 @@ def demo_coscan():
     dong_result_file_name = "scene_27.ply"
     move_list = MOVE_LIST_DICT["front3d_19"]
 
-    #  error_max = 0.1 # front3d
-    error_max = 0.7 # mp3d
+    error_max = 0.5
     is_visual = False
     print_progress = True
 
