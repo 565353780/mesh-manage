@@ -3,6 +3,7 @@
 
 import numpy as np
 import open3d as o3d
+from tqdm import tqdm
 
 from mesh_manage.Config.color import COLOR_MAP_DICT
 
@@ -56,12 +57,19 @@ def getHeatMap(partial_mesh_file_path,
                save_complete_mesh_file_path,
                partial_noise_sigma=0,
                error_max=None,
-               is_visual=False):
-    complete_mesh = o3d.io.read_triangle_mesh(complete_mesh_file_path)
-    complete_pointcloud = o3d.io.read_point_cloud(complete_mesh_file_path)
+               is_visual=False,
+               print_progress=False):
+    if print_progress:
+        print("[INFO][draw_colormap::getHeatMap]")
+        print("\t start load complete mesh...")
+    complete_mesh = o3d.io.read_triangle_mesh(complete_mesh_file_path, print_progress=print_progress)
+    complete_pointcloud = o3d.io.read_point_cloud(complete_mesh_file_path, print_progress=print_progress)
 
-    partial_mesh = o3d.io.read_triangle_mesh(partial_mesh_file_path)
-    partial_pointcloud = o3d.io.read_point_cloud(partial_mesh_file_path)
+    if print_progress:
+        print("[INFO][draw_colormap::getHeatMap]")
+        print("\t start load partial mesh...")
+    partial_mesh = o3d.io.read_triangle_mesh(partial_mesh_file_path, print_progress=print_progress)
+    partial_pointcloud = o3d.io.read_point_cloud(partial_mesh_file_path, print_progress=print_progress)
 
     threshold = 1.0
     trans_init = np.asarray([[1,0,0,0],
@@ -82,7 +90,13 @@ def getHeatMap(partial_mesh_file_path,
         noise_y = np.random.normal(0, partial_noise_sigma, partial_points.shape[0])
         noise_z = np.random.normal(0, partial_noise_sigma, partial_points.shape[0])
         noise = []
-        for i in range(partial_points.shape[0]):
+
+        for_data = range(partial_points.shape[0])
+        if print_progress:
+            print("[INFO][draw_colormap::getHeatMap]")
+            print("\t start generate noise...")
+            for_data = tqdm(for_data)
+        for i in for_data:
             noise.append([noise_x[i], noise_y[i], noise_z[i]])
         noise = np.array(noise)
         partial_points += noise
@@ -94,8 +108,7 @@ def getHeatMap(partial_mesh_file_path,
     partial_pointcloud.colors = o3d.utility.Vector3dVector(partial_colors)
     partial_mesh.vertex_colors = o3d.utility.Vector3dVector(partial_colors)
 
-    dist_to_partial = complete_pointcloud.compute_point_cloud_distance(
-        partial_pointcloud)
+    dist_to_partial = complete_pointcloud.compute_point_cloud_distance(partial_pointcloud)
 
     colors = []
     color_num = len(color_map)
@@ -105,7 +118,12 @@ def getHeatMap(partial_mesh_file_path,
         max_dist = np.max(dist_to_partial)
     dist_step = (max_dist - min_dist) / (color_num - 1.0)
 
-    for dist in dist_to_partial:
+    for_data = dist_to_partial
+    if print_progress:
+        print("[INFO][draw_colormap::getHeatMap]")
+        print("\t start generate heatmap...")
+        for_data = tqdm(for_data)
+    for dist in for_data:
         dist_divide = dist / dist_step
         color_idx = int(dist_divide)
         if color_idx >= color_num - 1:
@@ -132,8 +150,17 @@ def getHeatMap(partial_mesh_file_path,
     if is_visual:
         o3d.visualization.draw_geometries([partial_mesh, complete_pointcloud])
 
-    o3d.io.write_triangle_mesh(save_partial_mesh_file_path, partial_mesh, write_ascii=True)
-    o3d.io.write_triangle_mesh(save_complete_mesh_file_path, complete_mesh, write_ascii=True)
+    if print_progress:
+        print("[INFO][draw_colormap::getHeatMap]")
+        print("\t start save partial mesh...")
+    o3d.io.write_triangle_mesh(save_partial_mesh_file_path, partial_mesh,
+                               write_ascii=True, print_progress=print_progress)
+
+    if print_progress:
+        print("[INFO][draw_colormap::getHeatMap]")
+        print("\t start save heatmap...")
+    o3d.io.write_triangle_mesh(save_complete_mesh_file_path, complete_mesh,
+                               write_ascii=True, print_progress=print_progress)
     return True
 
 def demo():
@@ -156,38 +183,41 @@ def demo():
 
 def demo_coscan():
     coscan_partial_mesh_file_path = \
-        "/home/chli/chLi/coscan_data/scene_result/matterport3d_03/coscan/scene_19.ply"
+        "/home/chli/chLi/coscan_data/scene_result/matterport3d_01/coscan/scene_29.ply"
     dong_partial_mesh_file_path = \
-        "/home/chli/chLi/coscan_data/scene_result/matterport3d_03/dong/scene_21.ply"
+        "/home/chli/chLi/coscan_data/scene_result/matterport3d_01/dong/scene_24.ply"
 
     complete_mesh_file_path = \
-        "/home/chli/chLi/coscan_data/scene_result/matterport3d_03/matterport_03_cut.ply"
+        "/home/chli/chLi/coscan_data/scene_result/matterport3d_01/matterport_01_cut.ply"
 
     coscan_save_partial_mesh_file_path = \
-        "/home/chli/chLi/coscan_data/scene_result/matterport3d_03/part_coscan.ply"
+        "/home/chli/chLi/coscan_data/scene_result/matterport3d_01/part_coscan.ply"
     dong_save_partial_mesh_file_path = \
-        "/home/chli/chLi/coscan_data/scene_result/matterport3d_03/part_dong.ply"
+        "/home/chli/chLi/coscan_data/scene_result/matterport3d_01/part_dong.ply"
 
     coscan_save_complete_mesh_file_path = \
-        "/home/chli/chLi/coscan_data/scene_result/matterport3d_03/comp_coscan.ply"
+        "/home/chli/chLi/coscan_data/scene_result/matterport3d_01/comp_coscan.ply"
     dong_save_complete_mesh_file_path = \
-        "/home/chli/chLi/coscan_data/scene_result/matterport3d_03/comp_dong.ply"
+        "/home/chli/chLi/coscan_data/scene_result/matterport3d_01/comp_dong.ply"
 
-    error_max = 0.5
+    error_max = 0.3 # mp3d01
+    #  error_max = 0.5 # mp3d03
 
     print("start get coscan heatmap...")
     getHeatMap(coscan_partial_mesh_file_path,
                complete_mesh_file_path,
                coscan_save_partial_mesh_file_path,
                coscan_save_complete_mesh_file_path,
-               error_max=error_max)
+               error_max=error_max,
+               print_progress=True)
 
     print("start get dong heatmap...")
     getHeatMap(dong_partial_mesh_file_path,
                complete_mesh_file_path,
                dong_save_partial_mesh_file_path,
                dong_save_complete_mesh_file_path,
-               error_max=error_max)
+               error_max=error_max,
+               print_progress=True)
     return True
 
 if __name__ == "__main__":
