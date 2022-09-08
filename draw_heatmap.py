@@ -31,7 +31,7 @@ def demo():
 
 def demo_coscan():
     scene_result_folder_path = "/home/chli/chLi/coscan_data/scene_result/"
-    scene_name = "front3d_19"
+    scene_name = "matterport3d_05"
     move_list = MOVE_LIST_DICT[scene_name]
     error_max = 0.5
     is_visual = False
@@ -66,7 +66,7 @@ def demo_coscan():
             "coscan_partial_mesh_file_path": scene_result_folder_path +
                 "matterport3d_05/coscan/scene_33.ply",
             "dong_partial_mesh_file_path": scene_result_folder_path +
-                "matterport3d_05/dong/scene_21.ply",
+                "matterport3d_05/dong/scene_16.ply",
             "complete_mesh_file_path":scene_result_folder_path +
                 "matterport3d_05/matterport_05_cut.ply",
         },
