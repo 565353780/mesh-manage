@@ -7,8 +7,13 @@ from mesh_manage.Method.io import loadFileData, saveChannelMesh
 
 from mesh_manage.Data.channel_pointcloud import ChannelPointCloud
 
+
 class ChannelMesh(ChannelPointCloud):
-    def __init__(self, mesh_file_path=None, save_ignore_channel_name_list=[], load_point_only=False):
+
+    def __init__(self,
+                 mesh_file_path=None,
+                 save_ignore_channel_name_list=[],
+                 load_point_only=False):
         super(ChannelMesh, self).__init__(None, save_ignore_channel_name_list)
         self.face_set = FaceSet()
 
@@ -18,7 +23,9 @@ class ChannelMesh(ChannelPointCloud):
 
     @classmethod
     def fromChannelPointCloud(cls, channel_pointcloud):
-        channel_mesh = cls(None, channel_pointcloud.save_ignore_channel_name_list, True)
+        channel_mesh = cls(None,
+                           channel_pointcloud.save_ignore_channel_name_list,
+                           True)
         channel_mesh.channel_point_list = channel_pointcloud.channel_point_list
         channel_mesh.kd_tree = channel_pointcloud.kd_tree
         channel_mesh.xyz_changed = channel_pointcloud.xyz_changed
@@ -29,7 +36,10 @@ class ChannelMesh(ChannelPointCloud):
         self.face_set.reset()
         return True
 
-    def loadData(self, mesh_file_path, load_point_only=False, print_progress=False):
+    def loadData(self,
+                 mesh_file_path,
+                 load_point_only=False,
+                 print_progress=False):
         self.reset()
 
         if print_progress:
@@ -45,7 +55,8 @@ class ChannelMesh(ChannelPointCloud):
             print("\t loadFileData failed!")
             return False
 
-        self.addChannelPointList(channel_name_list, channel_value_list_list, print_progress)
+        self.addChannelPointList(channel_name_list, channel_value_list_list,
+                                 print_progress)
 
         self.updateKDTree()
 
@@ -70,7 +81,8 @@ class ChannelMesh(ChannelPointCloud):
         return self.face_set.getPointIdxListAndMappingDict(face_idx_list)[0]
 
     def getChannelMeshByFace(self, face_idx_list):
-        point_idx_list, mapping_dict = self.face_set.getPointIdxListAndMappingDict(face_idx_list)
+        point_idx_list, mapping_dict = self.face_set.getPointIdxListAndMappingDict(
+            face_idx_list)
         if point_idx_list is None or mapping_dict is None:
             print("[ERROR][ChannelMesh::getChannelMeshByFace]")
             print("\t getPointIdxListAndMappingDict failed!")
@@ -116,7 +128,10 @@ class ChannelMesh(ChannelPointCloud):
             return False
         return True
 
-    def generateMeshByFace(self, face_idx_list, save_file_path, print_progress=False):
+    def generateMeshByFace(self,
+                           face_idx_list,
+                           save_file_path,
+                           print_progress=False):
         channel_mesh = self.getChannelMeshByFace(face_idx_list)
         if channel_mesh is None:
             print("[ERROR][ChannelMesh::generateMeshByFace]")
@@ -128,7 +143,10 @@ class ChannelMesh(ChannelPointCloud):
             return False
         return True
 
-    def generateMeshByPoint(self, point_idx_list, save_file_path, print_progress=False):
+    def generateMeshByPoint(self,
+                            point_idx_list,
+                            save_file_path,
+                            print_progress=False):
         channel_mesh = self.getChannelMeshByPoint(point_idx_list)
         if channel_mesh is None:
             print("[ERROR][ChannelMesh::generateMeshByPoint]")
@@ -149,6 +167,7 @@ class ChannelMesh(ChannelPointCloud):
         self.face_set.outputInfo(info_level + 1)
         return True
 
+
 def demo():
     mesh_file_path = "/home/chli/chLi/ScanNet/scans/scene0474_02/scene0474_02_vh_clean_2.ply"
 
@@ -158,7 +177,8 @@ def demo():
 
     point_idx_list = channel_mesh.getPointIdxListFromFaceIdxList(face_idx_list)
 
-    channel_mesh.generateMeshByFace(face_idx_list, "/home/chli/chLi/channel_mesh/test1.ply")
-    channel_mesh.generateMeshByPoint(point_idx_list, "/home/chli/chLi/channel_mesh/test2.ply")
+    channel_mesh.generateMeshByFace(face_idx_list,
+                                    "/home/chli/chLi/channel_mesh/test1.ply")
+    channel_mesh.generateMeshByPoint(point_idx_list,
+                                     "/home/chli/chLi/channel_mesh/test2.ply")
     return True
-
