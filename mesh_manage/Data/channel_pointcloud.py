@@ -431,8 +431,8 @@ class ChannelPointCloud(object):
             for_data = self.channel_point_list
             if print_progress:
                 print("[INFO][ChannelPointCloud::savePCD]")
-                print("\t start save pointcloud to" + save_pointcloud_file_path +
-                      "...")
+                print("\t start save pointcloud to" +
+                      save_pointcloud_file_path + "...")
                 for_data = tqdm(self.channel_point_list)
             for channel_point in for_data:
                 last_channel_idx = len(channel_point.channel_list) - 1
