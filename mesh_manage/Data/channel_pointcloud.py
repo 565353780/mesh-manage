@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import numpy as np
 from tqdm import tqdm
 from scipy.spatial.kdtree import KDTree
 
@@ -46,17 +47,11 @@ class ChannelPointCloud(object):
         channel_name_list, channel_value_list_list, _ = loadFileData(
             pointcloud_file_path, True)
 
-        if channel_name_list == [] or channel_value_list_list == []:
-            print("[ERROR][ChannelPointCloud::loadData]")
-            print("\t loadFileData failed!")
-            return False
+        assert channel_name_list != [] or channel_value_list_list != []
 
-        if print_progress:
-            for channel_value_list in tqdm(channel_value_list_list):
-                self.addChannelPoint(channel_name_list, channel_value_list)
-        else:
-            for channel_value_list in channel_value_list_list:
-                self.addChannelPoint(channel_name_list, channel_value_list)
+        channel_point_list = getChannelPointListWithPool(
+            channel_name_list, channel_value_list_list)
+        self.channel_point_list.extend(channel_point_list)
 
         self.updateKDTree()
         return True
@@ -85,23 +80,15 @@ class ChannelPointCloud(object):
 
     def getBBox(self):
         xyz_list = self.getChannelValueListList(["x", "y", "z"])
-        if len(xyz_list) == 0:
-            print("[ERROR][ChannelPointCloud::getBBox]")
-            print("\t xyz values not found!")
-            return None
-        if None in xyz_list[0]:
-            print("[ERROR][ChannelPointCloud::getBBox]")
-            print("\t None in xyz values!")
-            return None
+        assert len(xyz_list) > 0
+        assert None not in xyz_list[0]
 
-        print(xyz_list[:][0])
-        print(min(xyz_list[:][0]))
-        exit()
+        xyz_array = np.array(xyz_list)
         bbox = BBox(
-            Point(min(xyz_list[:][0]), min(xyz_list[:][1]),
-                  min(xyz_list[:][2])),
-            Point(max(xyz_list[:][0]), max(xyz_list[:][1]),
-                  max(xyz_list[:][2])))
+            Point(min(xyz_array[:, 0]), min(xyz_array[:, 1]),
+                  min(xyz_array[:, 2])),
+            Point(max(xyz_array[:, 0]), max(xyz_array[:, 1]),
+                  max(xyz_array[:, 2])))
         return bbox
 
     def updateKDTree(self):
@@ -141,29 +128,13 @@ class ChannelPointCloud(object):
             print("[INFO][ChannelPointCloud::addChannelPointList]")
             print("\t start add channel point list...")
 
-        #  if print_progress:
-        #  for channel_value_list in tqdm(channel_value_list_list):
-        #  if not self.addChannelPoint(channel_name_list, channel_value_list):
-        #  print("[ERROR][ChannelPointCloud::addChannelPointList]")
-        #  print("\t addChannelPoint failed!")
-        #  return False
-        #  else:
-        #  for channel_value_list in channel_value_list_list:
-        #  if not self.addChannelPoint(channel_name_list, channel_value_list):
-        #  print("[ERROR][ChannelPointCloud::addChannelPointList]")
-        #  print("\t addChannelPoint failed!")
-        #  return False
-
         channel_point_list = getChannelPointListWithPool(
             channel_name_list, channel_value_list_list)
         self.channel_point_list.extend(channel_point_list)
         return True
 
     def getChannelPoint(self, channel_point_idx):
-        if channel_point_idx >= len(self.channel_point_list):
-            print("[ERROR][ChannelPointCloud::getChannelPoint]")
-            print("\t channel_point_idx out of range!")
-            return None
+        assert channel_point_idx < len(self.channel_point_list)
         return self.channel_point_list[channel_point_idx]
 
     def getFilterChannelPointCloud(self, point_idx_list):
@@ -172,10 +143,7 @@ class ChannelPointCloud(object):
 
         for channel_point_idx in point_idx_list:
             channel_point = self.getChannelPoint(channel_point_idx)
-            if channel_point is None:
-                print("[ERROR][ChannelPointCloud::getChannelPointCloud]")
-                print("\t getChannelPoint failed!")
-                return None
+            assert channel_point is not None
 
             channel_value_list = channel_point.getChannelValueList(
                 channel_name_list)
@@ -243,22 +211,13 @@ class ChannelPointCloud(object):
                          print_progress=False):
         pointcloud_size = len(self.channel_point_list)
         target_pointcloud_size = len(target_pointcloud.channel_point_list)
-        if target_pointcloud_size == 0:
-            print("[ERROR][ChannelPointCloud::copyChannelValue]")
-            print("\t target pointcloud is empty!")
-            return False
+        assert target_pointcloud_size > 0
 
-        if pointcloud_size > 0 and pointcloud_size != target_pointcloud_size:
-            print("[ERROR][ChannelPointCloud::copyChannelValue]")
-            print("\t pointcloud size not matched!")
-            return False
+        assert pointcloud_size == target_pointcloud_size
 
         first_point_channel_value_list = \
             target_pointcloud.channel_point_list[0].getChannelValueList(channel_name_list)
-        if None in first_point_channel_value_list:
-            print("[ERROR][ChannelPointCloud::copyChannelValue]")
-            print("\t target_pointcloud doesn't have all channels needed!")
-            return False
+        assert None not in first_point_channel_value_list
 
         print("[INFO][ChannelPointCloud::copyChannelValue]")
         print("\t start copy channel value :")
@@ -309,17 +268,11 @@ class ChannelPointCloud(object):
         if len(self.channel_point_list) == 0:
             return True
 
-        if len(target_pointcloud.channel_point_list) == 0:
-            print("[ERROR][ChannelPointCloud::setChannelValueByKDTree]")
-            print("\t target pointcloud is empty!")
-            return False
+        assert len(target_pointcloud.channel_point_list) > 0
 
         first_point_xyz = self.channel_point_list[0].getChannelValueList(
             ["x", "y", "z"])
-        if None in first_point_xyz:
-            print("[ERROR][ChannelPointCloud::setChannelValueByKDTree]")
-            print("\t pointcloud xyz not found!")
-            return False
+        assert None not in first_point_xyz
 
         first_point_channel_value_list = \
             target_pointcloud.getNearestChannelValueListValue(
@@ -327,10 +280,7 @@ class ChannelPointCloud(object):
                 first_point_xyz[1],
                 first_point_xyz[2],
                 channel_name_list)
-        if None in first_point_channel_value_list:
-            print("[ERROR][ChannelPointCloud::setChannelValueByKDTree]")
-            print("\t target_pointcloud doesn't have all channels needed!")
-            return False
+        assert None not in first_point_channel_value_list
 
         if print_progress:
             print("[INFO][ChannelPointCloud::setChannelValueByKDTree]")
@@ -363,15 +313,9 @@ class ChannelPointCloud(object):
     def removeOutlierPoints(self, outlier_dist_max, print_progress=False):
         self.updateKDTree()
 
-        if self.kd_tree is None:
-            print("[ERROR][ChannelPointCloud::removeOutlierPoints]")
-            print("\t kd_tree is None!")
-            return False
+        assert self.kd_tree is not None
 
-        if outlier_dist_max == 0:
-            print("[ERROR][ChannelPointCloud::removeOutlierPoints]")
-            print("\t outlier_dist_max is 0!")
-            return False
+        assert outlier_dist_max > 0
 
         remove_point_idx_list = []
 
@@ -411,17 +355,11 @@ class ChannelPointCloud(object):
         first_point_label_value = self.channel_point_list[0].getChannelValue(
             label_channel_name)
 
-        if first_point_label_value is None:
-            print("[ERROR][ChannelPointCloud::paintByLabel]")
-            print("\t label_channel not found!")
-            return False
+        assert first_point_label_value is not None
 
         color_map_size = len(color_map)
 
-        if color_map_size == 0:
-            print("[ERROR][ChannelPointCloud::paintByLabel]")
-            print("\t color_map is empty!")
-            return False
+        assert color_map_size > 0
 
         if print_progress:
             print("[INFO][ChannelPointCloud::paintByLabel]")
@@ -486,50 +424,34 @@ class ChannelPointCloud(object):
         return pcd_header
 
     def savePCD(self, save_pointcloud_file_path, print_progress=False):
-        if print_progress:
-            print("[INFO][ChannelPointCloud::savePCD]")
-            print("\t start save pointcloud to" + save_pointcloud_file_path +
-                  "...")
-
         with open(save_pointcloud_file_path, "w") as f:
             pcd_header = self.getPCDHeader()
             f.write(pcd_header)
+
+            for_data = self.channel_point_list
             if print_progress:
-                for channel_point in tqdm(self.channel_point_list):
-                    last_channel_idx = len(channel_point.channel_list) - 1
-                    for i in range(last_channel_idx + 1):
-                        if channel_point.channel_list[
-                                i].name in self.save_ignore_channel_name_list:
-                            if i == last_channel_idx:
-                                f.write("\n")
-                            continue
-                        f.write(str(channel_point.channel_list[i].value))
-                        if i < last_channel_idx:
-                            f.write(" ")
-                        else:
+                print("[INFO][ChannelPointCloud::savePCD]")
+                print("\t start save pointcloud to" + save_pointcloud_file_path +
+                      "...")
+                for_data = tqdm(self.channel_point_list)
+            for channel_point in for_data:
+                last_channel_idx = len(channel_point.channel_list) - 1
+                for i in range(last_channel_idx + 1):
+                    if channel_point.channel_list[
+                            i].name in self.save_ignore_channel_name_list:
+                        if i == last_channel_idx:
                             f.write("\n")
-            else:
-                for channel_point in self.channel_point_list:
-                    last_channel_idx = len(channel_point.channel_list) - 1
-                    for i in range(last_channel_idx + 1):
-                        if channel_point.channel_list[
-                                i].name in self.save_ignore_channel_name_list:
-                            if i == last_channel_idx:
-                                f.write("\n")
-                            continue
-                        f.write(str(channel_point.channel_list[i].value))
-                        if i < last_channel_idx:
-                            f.write(" ")
-                        else:
-                            f.write("\n")
+                        continue
+                    f.write(str(channel_point.channel_list[i].value))
+                    if i < last_channel_idx:
+                        f.write(" ")
+                    else:
+                        f.write("\n")
         return True
 
     def savePointCloud(self, save_pointcloud_file_path, print_progress=False):
         if save_pointcloud_file_path[:-4] == ".pcd":
-            if not self.savePCD(save_pointcloud_file_path, print_progress):
-                print("[ERROR][ChannelPointCloud::savePointCloud]")
-                print("\t savePCD failed!")
-                return False
+            assert self.savePCD(save_pointcloud_file_path, print_progress)
 
         if save_pointcloud_file_path[:-4] == ".ply":
             pcd_pointcloud_file_path = save_pointcloud_file_path[:-4] + ".pcd"
@@ -539,16 +461,9 @@ class ChannelPointCloud(object):
                     pcd_save_idx) + ".pcd"
                 pcd_save_idx += 1
 
-            if not self.savePCD(pcd_pointcloud_file_path, print_progress):
-                print("[ERROR][ChannelPointCloud::savePointCloud]")
-                print("\t savePCD for ply file failed!")
-                return False
-            if not transFormat(pcd_pointcloud_file_path,
-                               save_pointcloud_file_path, True,
-                               print_progress):
-                print("[ERROR][ChannelPointCloud::savePointCloud]")
-                print("\t transFormat failed!")
-                return False
+            assert self.savePCD(pcd_pointcloud_file_path, print_progress)
+            assert transFormat(pcd_pointcloud_file_path,
+                               save_pointcloud_file_path, True, print_progress)
         return True
 
     def outputInfo(self, info_level=0):
