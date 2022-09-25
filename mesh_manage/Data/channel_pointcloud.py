@@ -319,19 +319,16 @@ class ChannelPointCloud(object):
 
         remove_point_idx_list = []
 
+        for_data = range(len(self.channel_point_list))
         if print_progress:
             print("[INFO][ChannelPointCloud::removeOutlierPoints]")
             print("\t start remove outerlier points with outlier_dist_max = " +
                   str(outlier_dist_max) + "...")
-            for i in tqdm(range(len(self.channel_point_list))):
-                current_nearest_dist = self.getSelfNearestDist(i)
-                if current_nearest_dist > outlier_dist_max:
-                    remove_point_idx_list.append(i)
-        else:
-            for i in range(len(self.channel_point_list)):
-                current_nearest_dist = self.getSelfNearestDist(i)
-                if current_nearest_dist > outlier_dist_max:
-                    remove_point_idx_list.append(i)
+            for_data = tqdm(for_data)
+        for i in for_data:
+            current_nearest_dist = self.getSelfNearestDist(i)
+            if current_nearest_dist > outlier_dist_max:
+                remove_point_idx_list.append(i)
 
         if len(remove_point_idx_list) == 0:
             return True
