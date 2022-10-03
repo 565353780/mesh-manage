@@ -7,6 +7,8 @@ from tqdm import tqdm
 
 from mesh_manage.Config.color import COLOR_MAP_DICT
 
+from mesh_manage.Method.path import createFileFolder
+
 def getICPTrans(source_pointcloud, target_pointcloud, move_list=None):
     threshold = 1.0
     trans_init = np.asarray([[1,0,0,0],
@@ -107,6 +109,7 @@ def getHeatMap(partial_mesh_file_path,
                move_list=None,
                partial_noise_sigma=0,
                error_max=None,
+               use_icp=True,
                is_visual=False,
                print_progress=False):
     if print_progress:
@@ -119,14 +122,12 @@ def getHeatMap(partial_mesh_file_path,
         print("[INFO][heatmap::getHeatMap]")
         print("\t start load partial pointcloud...")
     partial_pointcloud = o3d.io.read_point_cloud(partial_mesh_file_path, print_progress=print_progress)
+    R = partial_pointcloud.get_rotation_matrix_from_xyz((-np.pi / 2.0, 0, 0))
+    partial_pointcloud.rotate(R, center=(0, 0, 0))
 
-    reg_p2p = getICPTrans(partial_pointcloud, complete_pointcloud, move_list)
-    partial_pointcloud.transform(reg_p2p.transformation)
-
-    if is_visual:
-        print("[INFO][heatmap::getHeatMap]")
-        print("\t start show icp result...")
-        o3d.visualization.draw_geometries([partial_pointcloud, complete_mesh])
+    if use_icp:
+        reg_p2p = getICPTrans(partial_pointcloud, complete_pointcloud, move_list)
+        partial_pointcloud.transform(reg_p2p.transformation)
 
     if partial_noise_sigma > 0:
         partial_points = np.array(partial_pointcloud.points)
@@ -153,6 +154,8 @@ def getHeatMap(partial_mesh_file_path,
         print("[INFO][heatmap::getHeatMap]")
         print("\t start show heatmap result...")
         o3d.visualization.draw_geometries([partial_pointcloud, complete_mesh])
+
+    createFileFolder(save_complete_mesh_file_path)
 
     if print_progress:
         print("[INFO][heatmap::getHeatMap]")
