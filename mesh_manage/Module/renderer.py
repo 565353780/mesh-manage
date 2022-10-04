@@ -52,9 +52,13 @@ class Renderer(object):
         return rotate_direction.tolist()
 
     def rotateVis(self, delta_rotate_angle):
-        #  self.euler_angle[0] += delta_rotate_angle * pi / 180.0
         self.euler_angle[0] = 0
-        self.euler_angle[1] = 0
+        self.euler_angle[1] = -10 * pi / 180.0
+        self.euler_angle[2] += delta_rotate_angle * pi / 180.0
+
+        # FIXME: only for demo
+        self.euler_angle[0] = 0
+        self.euler_angle[1] = 30 * pi / 180.0
         self.euler_angle[2] = 90 * pi / 180.0
 
         ctr = self.vis.get_view_control()
@@ -66,7 +70,7 @@ class Renderer(object):
         ctr.set_up(up_direction)
 
         ctr.set_lookat(self.render_center)
-        #  ctr.set_zoom(0.5)
+        ctr.set_zoom(0.1)
         return True
 
     def renderMesh(self, mesh_file_path):
@@ -76,9 +80,28 @@ class Renderer(object):
 
         mesh = o3d.io.read_triangle_mesh(mesh_file_path)
 
-        mesh.compute_vertex_normals()
-
         self.render_center = mesh.get_axis_aligned_bounding_box().get_center()
+        self.render_center[0] += 14
+        self.render_center[2] -= 5
+
+        bbox_points = np.array(mesh.get_axis_aligned_bounding_box().get_box_points()).tolist()
+
+        colors = np.array(mesh.vertex_colors)
+        gray_points_idx = np.where(colors[:, 0] > 130.0 / 255.0)[0]
+        mesh.remove_vertices_by_index(gray_points_idx)
+
+        points = np.array(mesh.vertices).tolist()
+        for bbox_point in bbox_points:
+            points.append(bbox_point)
+
+        colors = np.array(mesh.vertex_colors).tolist()
+        for bbox_point in bbox_points:
+            colors.append([1.0, 1.0, 1.0])
+
+        mesh.vertices = o3d.utility.Vector3dVector(np.array(points))
+        mesh.vertex_colors = o3d.utility.Vector3dVector(np.array(colors))
+
+        mesh.compute_vertex_normals()
 
         self.vis.create_window(window_name="Renderer")
         render_option = self.vis.get_render_option()
@@ -103,6 +126,27 @@ class Renderer(object):
         mesh = o3d.io.read_triangle_mesh(mesh_file_path)
 
         self.render_center = mesh.get_axis_aligned_bounding_box().get_center()
+        self.render_center[0] += 14
+        self.render_center[2] -= 5
+
+        bbox_points = np.array(mesh.get_axis_aligned_bounding_box().get_box_points()).tolist()
+
+        colors = np.array(mesh.vertex_colors)
+        gray_points_idx = np.where(colors[:, 0] > 130.0 / 255.0)[0]
+        mesh.remove_vertices_by_index(gray_points_idx)
+
+        points = np.array(mesh.vertices).tolist()
+        for bbox_point in bbox_points:
+            points.append(bbox_point)
+
+        colors = np.array(mesh.vertex_colors).tolist()
+        for bbox_point in bbox_points:
+            colors.append([1.0, 1.0, 1.0])
+
+        mesh.vertices = o3d.utility.Vector3dVector(np.array(points))
+        mesh.vertex_colors = o3d.utility.Vector3dVector(np.array(colors))
+
+        mesh.compute_vertex_normals()
 
         self.vis.create_window(window_name="Renderer")
         render_option = self.vis.get_render_option()
@@ -110,12 +154,6 @@ class Renderer(object):
         render_option.point_size = 1
 
         self.vis.add_geometry(mesh)
-
-        for i in range(100):
-            self.rotateVis(0.5)
-            #  self.vis.update_geometry()
-            self.vis.poll_events()
-            self.vis.update_renderer()
 
         self.rotateVis(0.5)
         #  self.vis.update_geometry()
