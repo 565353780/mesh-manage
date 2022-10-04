@@ -35,12 +35,13 @@ def demo_heatmap():
 
 def demo_ff_heatmap():
     for idx in range(28):
+    #  for idx in [0, 27]:
         partial_mesh_file_path = \
             "/home/chli/chLi/coscan_data/fast_forward/ff_recon_result/merged_vpp_mesh_" + str(idx) + ".ply"
         complete_mesh_file_path = \
-            "/home/chli/chLi/coscan_data/fast_forward/company_source.ply"
+            "/home/chli/chLi/coscan_data/fast_forward/company_source_remesh_cut.ply"
         save_complete_mesh_file_path = \
-            "/home/chli/chLi/coscan_data/fast_forward/ff_recon_result_render/merged_vpp_mesh_" + str(idx) + ".ply"
+            "/home/chli/chLi/coscan_data/fast_forward/ff_recon_result_render_gray_blue/merged_vpp_mesh_" + str(idx) + ".ply"
         move_list = MOVE_LIST_DICT["company"]
         error_max = 0.5
         use_icp = False
