@@ -56,6 +56,7 @@ def demo_ff_heatmap():
         print("===========================")
         print("==== start get heatmap ====")
         print("===========================")
+        print(idx + 1, "/", 28)
         getHeatMap(partial_mesh_file_path,
                    complete_mesh_file_path,
                    tmp_save_complete_mesh_file_path,
