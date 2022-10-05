@@ -57,9 +57,9 @@ class Renderer(object):
         self.euler_angle[2] += delta_rotate_angle * pi / 180.0
 
         # FIXME: only for demo
-        self.euler_angle[0] = 0
-        self.euler_angle[1] = 30 * pi / 180.0
-        self.euler_angle[2] = 90 * pi / 180.0
+        self.euler_angle[0] = -90 * pi / 180.0
+        self.euler_angle[1] = 0 * pi / 180.0
+        self.euler_angle[2] = 50 * pi / 180.0
 
         ctr = self.vis.get_view_control()
 
@@ -70,7 +70,7 @@ class Renderer(object):
         ctr.set_up(up_direction)
 
         ctr.set_lookat(self.render_center)
-        ctr.set_zoom(0.1)
+        ctr.set_zoom(0.12)
         return True
 
     def renderMesh(self, mesh_file_path):
@@ -81,8 +81,8 @@ class Renderer(object):
         mesh = o3d.io.read_triangle_mesh(mesh_file_path)
 
         self.render_center = mesh.get_axis_aligned_bounding_box().get_center()
-        self.render_center[0] += 14
-        self.render_center[2] -= 5
+        self.render_center[0] += 18
+        self.render_center[2] -= 2
 
         bbox_points = np.array(mesh.get_axis_aligned_bounding_box().get_box_points()).tolist()
 
@@ -126,8 +126,8 @@ class Renderer(object):
         mesh = o3d.io.read_triangle_mesh(mesh_file_path)
 
         self.render_center = mesh.get_axis_aligned_bounding_box().get_center()
-        self.render_center[0] += 14
-        self.render_center[2] -= 5
+        self.render_center[0] += 18
+        self.render_center[2] -= 2
 
         bbox_points = np.array(mesh.get_axis_aligned_bounding_box().get_box_points()).tolist()
 
