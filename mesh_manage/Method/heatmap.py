@@ -122,9 +122,10 @@ def getHeatMap(partial_mesh_file_path,
         print("[INFO][heatmap::getHeatMap]")
         print("\t start load partial pointcloud...")
     partial_pointcloud = o3d.io.read_point_cloud(partial_mesh_file_path, print_progress=print_progress)
+
     # FIXME: for fast forward company ply file only
-    R = partial_pointcloud.get_rotation_matrix_from_xyz((-np.pi / 2.0, 0, 0))
-    partial_pointcloud.rotate(R, center=(0, 0, 0))
+    #  R = partial_pointcloud.get_rotation_matrix_from_xyz((-np.pi / 2.0, 0, 0))
+    #  partial_pointcloud.rotate(R, center=(0, 0, 0))
 
     if use_icp:
         reg_p2p = getICPTrans(partial_pointcloud, complete_pointcloud, move_list)
